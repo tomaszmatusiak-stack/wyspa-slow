@@ -232,7 +232,9 @@ jako materiał · `prefers-reduced-motion` wyłącza animacje CSS.
 
 ---
 
-## 8. Uruchomienie
+## 8. Uruchomienie i deploy
+
+### Lokalnie
 
 ```bash
 npm install --prefix wyspa_slow
@@ -243,6 +245,32 @@ npm run dev --prefix wyspa_slow
 ```
 
 Aplikacja startuje na `http://localhost:5180`.
+
+### Publicznie
+
+**https://tomaszmatusiak-stack.github.io/wyspa-slow/**
+
+Repo: `github.com/tomaszmatusiak-stack/wyspa-slow` (publiczne).
+Każdy push na `main` uruchamia workflow `.github/workflows/deploy.yml`, który buduje
+projekt i publikuje `dist/` na GitHub Pages. Nic nie trzeba robić ręcznie.
+
+Adres jest publiczny, ale **apka nie ma backendu** — cały postęp siedzi w `IndexedDB`
+w przeglądarce dziecka. Nie ma kont, logowania, analityki ani reklam, więc publiczny
+URL nie wystawia żadnych danych.
+
+`vite.config.ts` ma `base: './'`, więc ta sama paczka działa w katalogu głównym domeny,
+w podkatalogu Pages i z pliku lokalnego.
+
+### Lektor
+
+Domyślnie wybierany jest najlepszy dostępny **naturalny głos kobiecy**, brytyjski przed
+amerykańskim (`src/audio/tts.ts`). Kolejność to jawna lista jakości, nie tylko filtr płci:
+głosy sztuczne i stylizowane (nowa „ekspresyjna" rodzina macOS — Flo, Sandy, Shelley)
+lądują na dole, a żartobliwe (Zarvox, Bubbles, Trinoids…) są odfiltrowane całkowicie.
+
+Na tym Macu wypada **Samantha** (en-US). Lepsze głosy brytyjskie (Serena) można doinstalować:
+Ustawienia systemowe → Dostępność → Treść mówiona → Zarządzaj głosami. Zestaw głosów
+zależy od urządzenia, więc na tablecie lista będzie inna — wybór jest w Ustawieniach profilu.
 
 ---
 
