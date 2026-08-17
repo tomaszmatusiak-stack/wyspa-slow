@@ -7,6 +7,7 @@ import { useSay } from './useSay'
 import { PrimaryButton, Tile } from '../ui/kit'
 import type { Challenge, Tier } from '../types'
 import { CHALLENGE } from '../engine/difficulty'
+import { requestPersistentStorage } from '../store/persist'
 
 export function Settings({ onClose }: { onClose: () => void }) {
   const profile = useActiveProfile()
@@ -15,6 +16,11 @@ export function Settings({ onClose }: { onClose: () => void }) {
   const selectProfile = useGame((s) => s.selectProfile)
   const say = useSay()
   const [voices, setVoices] = useState(englishVoices())
+  const [persisted, setPersisted] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    void requestPersistentStorage().then(setPersisted)
+  }, [])
 
   // Safari zwraca listę głosów dopiero po chwili.
   useEffect(() => {
@@ -190,6 +196,24 @@ export function Settings({ onClose }: { onClose: () => void }) {
           </div>
           <p className="mt-2 text-sm font-bold text-ink-soft">
             Jedna lekcja to cały dzień z planu: cztery rundy, około 45 minut.
+          </p>
+        </Section>
+
+        <Section title="Zapisany postęp">
+          <p
+            className={`rounded-xl px-3 py-2 text-sm font-bold ${
+              persisted ? 'bg-emerald-100 text-emerald-900' : 'bg-slate-100 text-ink'
+            }`}
+          >
+            {persisted === null
+              ? 'Sprawdzam…'
+              : persisted
+                ? 'Postęp jest zapisany na tym urządzeniu i zabezpieczony przed automatycznym czyszczeniem.'
+                : 'Postęp jest zapisany na tym urządzeniu. Na iPadzie i iPhonie warto dodać apkę do ekranu początkowego — inaczej Safari może wyczyścić dane po dłuższej przerwie.'}
+          </p>
+          <p className="mt-2 text-sm font-bold text-ink-soft">
+            Postęp każdego gracza jest osobny, ale zapisuje się tylko tutaj — na innym
+            urządzeniu apka zacznie od zera.
           </p>
         </Section>
 

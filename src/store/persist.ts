@@ -51,6 +51,25 @@ export async function kvSet(key: string, value: unknown): Promise<void> {
   }
 }
 
+/**
+ * Prosi przeglądarkę, żeby nie usuwała naszych danych przy braku miejsca na dysku.
+ * Bez tego IndexedDB jest „best effort" i system może je wyrzucić — a tu siedzi
+ * kilka tygodni pracy dziecka.
+ *
+ * Zwraca `true`, gdy dane są objęte ochroną. Safari nie wspiera `persist()`,
+ * więc tam ochronę daje dopiero dodanie apki do ekranu głównego.
+ */
+export async function requestPersistentStorage(): Promise<boolean> {
+  try {
+    if (!navigator.storage?.persisted) return false
+    if (await navigator.storage.persisted()) return true
+    if (!navigator.storage.persist) return false
+    return await navigator.storage.persist()
+  } catch {
+    return false
+  }
+}
+
 /** Zapisy są częste (co odpowiedź), więc zbijamy je w jeden. */
 export function debounced<T extends unknown[]>(fn: (...args: T) => void, ms: number) {
   let timer: ReturnType<typeof setTimeout> | undefined

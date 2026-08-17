@@ -67,8 +67,19 @@ Apka pamięta, kto grał ostatni, więc po odświeżeniu wchodzi wprost do jego 
 Żeby przełączyć: **dotknij awatara w lewym górnym rogu → wybierz drugie dziecko z listy
 „Kto teraz gra?"**. Awatar ma znaczek ⇄, gdy jest więcej niż jeden gracz.
 
-Każdy gracz ma własny postęp, poziom, gwiazdki i własne ustawienia (głos, poziom zadań,
-poziom wyzwania).
+Każdy gracz ma **własny, oddzielny postęp**: XP, poziom, kryształy, serię dni, gwiazdki,
+pudełka powtórek SRS, licznik ukończonych rund w każdej lekcji i własne ustawienia
+(głos, poziom zadań, poziom wyzwania). W zapisie wszystko jest kluczowane identyfikatorem
+gracza, więc dzieci nie wchodzą sobie w drogę — jedno może być w tygodniu 3, drugie w tygodniu 1
+tej samej apki.
+
+Zapis idzie do `IndexedDB` po każdej odpowiedzi (zbite w jeden zapis co 400 ms), więc przetrwa
+odświeżenie i zamknięcie przeglądarki. Apka prosi też o `navigator.storage.persist()`, żeby
+system nie wyrzucił danych przy braku miejsca.
+
+**Czego to nie przetrwa:** wyczyszczenia danych witryny, trybu prywatnego i przejścia na inne
+urządzenie. Na iPadzie i iPhonie dodanie do ekranu początkowego jest istotne nie tylko dla wygody —
+Safari czyści dane stron nieodwiedzanych od dłuższego czasu, a zainstalowana apka jest z tego wyjęta.
 
 ## Prywatność
 

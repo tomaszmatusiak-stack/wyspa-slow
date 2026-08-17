@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useActiveProfile, useGame } from '../store/useGame'
 import { validateContent } from '../content/worlds'
+import { requestPersistentStorage } from '../store/persist'
 import { ProfileGate } from './ProfileGate'
 import { MapScreen } from './MapScreen'
 import { LessonScreen } from './LessonScreen'
@@ -20,6 +21,8 @@ export function App() {
 
   useEffect(() => {
     void hydrate()
+    // Prosimy raz, przy starcie — inaczej przeglądarka może wyrzucić zapisany postęp.
+    void requestPersistentStorage()
     if (import.meta.env.DEV) {
       const problems = validateContent()
       if (problems.length) console.warn('Problemy w treści:\n' + problems.join('\n'))
