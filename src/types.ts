@@ -183,6 +183,7 @@ export type ExerciseKind =
   | 'bubbles'
   | 'math'
   | 'dialog'
+  | 'dialogOrder'
   | 'verbForm'
   | 'verbTable'
   | 'tenseSort'
@@ -240,6 +241,18 @@ export interface DialogTask extends TaskBase {
   /** Indeks ukrytej linii. */
   hiddenIndex: number
   options: string[]
+}
+
+/**
+ * Ułóż rozmowę w kolejności. Pierwsza kwestia jest dana jako punkt zaczepienia,
+ * resztę dziecko wskazuje po kolei. Zero nowego materiału — ten sam dialog,
+ * druga forma ćwiczenia.
+ */
+export interface DialogOrderTask extends TaskBase {
+  kind: 'dialogOrder'
+  dialog: Dialog
+  /** Potasowane indeksy kwestii do ułożenia (bez pierwszej). */
+  shuffled: number[]
 }
 
 /** Połącz w pary — dokładnie jak „Połącz słowo z polskim znaczeniem" z kart pracy. */
@@ -335,6 +348,7 @@ export type Task =
   | BubblesTask
   | MathTask
   | DialogTask
+  | DialogOrderTask
   | VerbFormTask
   | VerbTableTask
   | TenseSortTask

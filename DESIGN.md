@@ -88,6 +88,10 @@ co daje **3600 zadań** w całym kursie.
 | 3 | 🧩 **Zdania** | układanie zdań z klocków, uzupełnianie luk, dialog |
 | 4 | 🏆 **Mistrz** | sortowanie, memory, powtórki SRS, działania po angielsku |
 
+Każdy dialog pracuje dwa razy: w rundzie „Zdania" jako **uzupełnianie brakującej kwestii**,
+a na finał rundy „Mistrz" jako **układanie całej rozmowy po kolei**. Drugie ćwiczenie nie kosztowało
+ani jednego nowego zdania — to ta sama treść w trudniejszej formie.
+
 Każda lekcja ma **własny dialog** o id `d.<lessonId>` — worlds.ts podpina je automatycznie,
 więc nie da się zapomnieć przypisania. Cztery scenki z pakietu siedzą na swoich piątkach
 w oryginalnym brzmieniu. Warianty brakującej kwestii pochodzą wyłącznie z rozmów
@@ -155,7 +159,7 @@ Lekcja dokłada do 4 elementów należnych dziś z wcześniejszych lekcji.
 
 ## 4. Typy zadań
 
-**Zbudowane (15):**
+**Zbudowane (16):**
 
 | Typ | Co robi | Skąd |
 |---|---|---|
@@ -171,6 +175,7 @@ Lekcja dokłada do 4 elementów należnych dziś z wcześniejszych lekcji.
 | **Złap wszystkie słowa** | bąbelki z kategorią do wyłapania | rozładowanie w środku rundy |
 | **Policz po angielsku** | `eight + two = ?` z angielskimi liczebnikami | Karta pracy 1A, zadanie 3 |
 | **Dialog z luką** | cała rozmowa, jedna kwestia wycięta | jeden dialog na każdą lekcję |
+| **Ułóż rozmowę po kolei** | pierwsza kwestia dana, resztę wskazujesz w kolejności | ten sam dialog, zero nowej treści |
 | **Wybierz właściwą formę** | `My sister ___ an apple every day.` → plays / play / playing | odmiana czasownika |
 | **Odmień czasownik** | trzy formy naraz: on/ona · teraz · wczoraj | tabelka odmiany |
 | **Kiedy to się dzieje?** | zdanie → codziennie / teraz / wczoraj | rozpoznawanie czasu |

@@ -49,6 +49,7 @@ export function retryTask(task: Task, ease: boolean): Task {
     case 'sorting':
     case 'bubbles':
     case 'dialog':
+    case 'dialogOrder':
     case 'verbForm':
     case 'verbTable':
     case 'tenseSort':

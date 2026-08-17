@@ -12,6 +12,7 @@ import { Sorting } from './Sorting'
 import { Bubbles } from './Bubbles'
 import { MathQuiz } from './MathQuiz'
 import { DialogGap } from './DialogGap'
+import { DialogOrder } from './DialogOrder'
 import { VerbForm } from './VerbForm'
 import { VerbTable } from './VerbTable'
 import { TenseSort } from './TenseSort'
@@ -42,6 +43,8 @@ export function Exercise({ task, say, onAnswer }: ExerciseProps<Task>) {
       return <MathQuiz task={task} say={say} onAnswer={onAnswer} />
     case 'dialog':
       return <DialogGap task={task} say={say} onAnswer={onAnswer} />
+    case 'dialogOrder':
+      return <DialogOrder task={task} say={say} onAnswer={onAnswer} />
     case 'verbForm':
       return <VerbForm task={task} say={say} onAnswer={onAnswer} />
     case 'verbTable':

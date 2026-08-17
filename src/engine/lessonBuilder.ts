@@ -380,6 +380,21 @@ function tenseSort(m: Material): Task | null {
   }
 }
 
+/** Ta sama rozmowa, druga forma ćwiczenia — bez ani jednego nowego zdania. */
+function dialogOrder(m: Material): Task | null {
+  const dialog = m.ctx.lesson.dialogId ? DIALOG_BY_ID.get(m.ctx.lesson.dialogId) : undefined
+  if (!dialog || dialog.lines.length < 4) return null
+  return {
+    key: key('dord'),
+    kind: 'dialogOrder',
+    tier: Math.min(2, m.ctx.maxTier) as Tier,
+    itemIds: [`${dialog.id}#order`],
+    isReview: false,
+    dialog,
+    shuffled: shuffle(dialog.lines.map((_, i) => i).filter((i) => i > 0)),
+  }
+}
+
 function dialogTasks(m: Material, count: number): Task[] {
   const dialog = m.ctx.lesson.dialogId ? DIALOG_BY_ID.get(m.ctx.lesson.dialogId) : undefined
   if (!dialog) return []
@@ -474,6 +489,8 @@ const ROUND_BUILDERS: RoundBuilder[] = [
       math(m),
       ...interleave([reviews.slice(2), drills.slice(2), forms]).slice(0, 4),
       bubbles(m),
+      // Finał dnia: cała rozmowa do ułożenia po kolei.
+      dialogOrder(m),
     ]
   },
 ]
