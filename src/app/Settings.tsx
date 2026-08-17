@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
-import { englishVoices, isFemaleVoice } from '../audio/tts'
+import { englishVoices, isFemaleVoice, resolveVoice } from '../audio/tts'
 import { useActiveProfile, useGame } from '../store/useGame'
 import { useSay } from './useSay'
 import { PrimaryButton, Tile } from '../ui/kit'
@@ -29,6 +29,7 @@ export function Settings({ onClose }: { onClose: () => void }) {
 
   if (!profile) return null
   const s = profile.settings
+  const current = resolveVoice(s.voice)
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4">
@@ -50,19 +51,36 @@ export function Settings({ onClose }: { onClose: () => void }) {
             onChange={(e) => update({ voice: e.target.value || null })}
             className="w-full rounded-xl border-2 border-slate-300 bg-white px-3 py-3 font-bold"
           >
-            <option value="">
-              Automatycznie — miły kobiecy ({voices[0]?.name ?? 'brak głosów EN'})
-            </option>
+            <option value="">Automatycznie — najlepszy kobiecy</option>
             {voices.map((v) => (
               <option key={v.name} value={v.name}>
                 {isFemaleVoice(v) ? '♀' : '♂'} {v.name} · {v.lang}
               </option>
             ))}
           </select>
+          {/* Bez tego trzeba by zgadywać, co apka faktycznie wybrała na danym urządzeniu. */}
+          <p
+            className={`mt-2 rounded-xl px-3 py-2 text-sm font-extrabold ${
+              current && isFemaleVoice(current)
+                ? 'bg-emerald-100 text-emerald-900'
+                : 'bg-amber-100 text-amber-900'
+            }`}
+          >
+            {current
+              ? `Teraz mówi: ${isFemaleVoice(current) ? '♀' : '♂'} ${current.name} · ${current.lang}`
+              : 'Ładuję listę głosów…'}
+            {current && !isFemaleVoice(current) && (
+              <span className="mt-1 block font-bold">
+                Na tym urządzeniu nie ma żadnego głosu kobieckiego, jaki apka zna. Wybierz
+                z listy albo doinstaluj głos w systemie.
+              </span>
+            )}
+          </p>
           <p className="mt-2 text-sm font-bold text-ink-soft">
             Lista jest posortowana od najlepszego: naturalne kobiece głosy na górze, żartobliwe
             głosy systemowe odfiltrowane. Lepsze głosy (np. brytyjska Serena) można doinstalować
-            w systemie: Ustawienia → Dostępność → Treść mówiona → Zarządzaj głosami.
+            w systemie: macOS → Ustawienia → Dostępność → Treść mówiona → Zarządzaj głosami;
+            Windows → Ustawienia → Czas i język → Mowa.
           </p>
           <div className="mt-2 flex items-center gap-3">
             <PrimaryButton tone="slate" onClick={() => say('Hello! My name is Sparky.')}>

@@ -405,9 +405,22 @@ amerykańskim (`src/audio/tts.ts`). Kolejność to jawna lista jakości, nie tyl
 głosy sztuczne i stylizowane (nowa „ekspresyjna" rodzina macOS — Flo, Sandy, Shelley)
 lądują na dole, a żartobliwe (Zarvox, Bubbles, Trinoids…) są odfiltrowane całkowicie.
 
-Na tym Macu wypada **Samantha** (en-US). Lepsze głosy brytyjskie (Serena) można doinstalować:
-Ustawienia systemowe → Dostępność → Treść mówiona → Zarządzaj głosami. Zestaw głosów
-zależy od urządzenia, więc na tablecie lista będzie inna — wybór jest w Ustawieniach profilu.
+**Trzy pułapki, na których to wykładało się na innym sprzęcie** — wszystkie naprawione:
+
+1. **Nazwy głosów są różne na każdej platformie.** macOS ma `Samantha`, Windows
+   `Microsoft Zira Desktop - English (United States)`, Chrome `Google UK English Female`,
+   a macOS dokleja zlokalizowany suffiks: `Flo (angielski (Wielka Brytania))`. Dopasowanie
+   po pełnej nazwie nie miało szans — teraz szukamy imienia **wśród słów nazwy**.
+   Doszła też lista imion męskich, żeby nieznany głos nie awansował przed znany kobiecy.
+2. **Lista głosów nie jest gotowa od razu.** `getVoices()` zwraca pustą tablicę do zdarzenia
+   `voiceschanged`. Pierwsze zadanie chciało mówić wcześniej, więc wybór spadał na przeglądarkę —
+   a jej domyślny głos to zwykle męski (Daniel, David). Teraz wypowiedź czeka na listę.
+3. **Timery w karcie w tle są spowalniane do ~1 s.** Limit oczekiwania liczony jako suma
+   interwałów po 120 ms rozciągał półtorej sekundy do kilkunastu. Termin liczymy zegarem.
+
+Ustawienia pokazują, **który głos faktycznie mówi** („Teraz mówi: ♀ Samantha · en-US"),
+z ostrzeżeniem, gdy na urządzeniu nie ma żadnego znanego głosu kobieckiego. Bez tego trzeba
+było zgadywać, co apka wybrała na danym sprzęcie.
 
 ---
 
