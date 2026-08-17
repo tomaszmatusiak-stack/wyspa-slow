@@ -1,6 +1,6 @@
 # Wyspa Słów — angielski dla dzieci przez grywalizację
 
-Dokument projektowy · wersja 3.0 (lekcje dzienne po ~45 minut, 12 typów zadań)
+Dokument projektowy · wersja 4.0 (12 tygodni, odmiany czasowników, trzy czasy)
 Stan: **Etap 1 zbudowany i zweryfikowany w przeglądarce.**
 
 ---
@@ -64,8 +64,20 @@ Mapa → Kraina (= tydzień planu) → Lekcja (= jeden dzień) → Runda (4 na l
 | 3 | **Sport i czas wolny** | Na boisku | Czasowniki ruchu | Umiem / nie umiem | Hobby i pytania | Na treningu *(dialog)* |
 | 4 | **Wakacje i świat** | Pogoda | Kolory i ubrania | Miejsca | Zakupy i ceny | W sklepie *(dialog)* |
 
-Zbudowane: **128 słów i zwrotów · 52 zdania · 4 dialogi · 20 lekcji dziennych.**
-Każda lekcja generuje **60 zadań** (4 rundy × 15).
+| # | Kraina | Pon | Wt | Śr | Czw | Pt |
+|---|---|---|---|---|---|---|
+| 5 | **Szkoła** | W klasie | Piórnik | Ile ich jest? | Przedmioty | Co robimy w szkole |
+| 6 | **Mój dzień** | Pory dnia | Dni tygodnia | Która godzina? | Plan dnia | Zawsze czy nigdy? |
+| 7 | **Ciało i zdrowie** | Głowa i twarz | Ręce i nogi | Boli mnie… | U lekarza | Odpoczynek |
+| 8 | **Zwierzęta** | Zwierzaki w domu | Na farmie | W zoo | W wodzie i w powietrzu | Co robią zwierzęta |
+| 9 | **Jedzenie i restauracja** | Posiłki | Coś na szybko | Owoce | Coś słodkiego | W restauracji |
+| 10 | **Dom i gdzie co jest** | Mieszkanie | Meble | Kuchnia i łazienka | Gdzie to jest? | Porządki |
+| 11 | **Wygląd i ubrania** | Jaki jesteś? | Włosy i okulary | Ciepłe ubrania | Codzienne ubrania | Kto co ma na sobie |
+| 12 | **Pory roku i wczoraj** | Cztery pory roku | Miesiące 1 | Miesiące 2 | Jaka pogoda? | Co było wczoraj |
+
+Zbudowane: **450 słów i zwrotów · 108 zdań · 63 czasowniki z pełną odmianą · 4 dialogi ·
+60 lekcji dziennych w 12 krainach.** Każda lekcja generuje **60 zadań** (4 rundy × 15),
+co daje **3600 zadań** w całym kursie.
 
 ### 3.1b Cztery rundy w lekcji
 
@@ -101,6 +113,33 @@ ustnie zamiast pisać. 10-latek: pisze i układa własne zdania"), więc profil 
 
 Do przestawienia ręcznie w ustawieniach.
 
+### 3.2b Odmiany czasowników i trzy czasy
+
+Osobna tabela `src/content/verbs.ts`: **63 czasowniki × 4 formy** (base, he/she, -ing, past).
+Z czterech form generator (`src/engine/verbDrills.ts`) **produkuje zdania sam** — dlatego
+kilkadziesiąt wierszy tabeli daje setki poprawnych, celowanych zadań gramatycznych,
+bez pisania każdego zdania z ręki.
+
+| Czas | Marker w zdaniu | Etykieta w apce |
+|---|---|---|
+| present simple | `every day` | 🔁 codziennie |
+| present continuous | `now` | ⏱️ teraz |
+| past simple | `yesterday` | ⬅️ wczoraj |
+
+Czasy wchodzą **stopniowo**: present od tygodnia 3, continuous od 6, past od 9.
+Bez tego dziecko dostawałoby trzy czasy naraz w tygodniu, w którym poznaje pierwsze czasowniki.
+
+Dystraktory to **pozostałe formy tego samego czasownika** — dokładnie te, które dziecko myli.
+Losowe słowa uczyłyby tylko eliminowania bzdur.
+
+Generator zna trzy pułapki, które inaczej produkowałyby zły angielski:
+- **czasowniki stanu** (`know`, `want`, `need`, `live`) nie dostają present continuous —
+  „I am knowing" nie może powstać;
+- **`every day` nie pasuje do wszystkiego** — „He lives in Poland every day" brzmi źle,
+  więc część czasowników nie bierze markera;
+- **podmiot nieosobowy** — `hurt` dostaje „My leg / My tummy", `fly` dostaje „The bird / The plane",
+  bo „He hurts every day" nie znaczy tego, co powinno.
+
 ### 3.3 Powtórki (SRS)
 
 Leitner, 5 pudełek, interwały **1 → 3 → 7 → 14 → 30 dni**.
@@ -111,7 +150,7 @@ Lekcja dokłada do 4 elementów należnych dziś z wcześniejszych lekcji.
 
 ## 4. Typy zadań
 
-**Zbudowane (12):**
+**Zbudowane (15):**
 
 | Typ | Co robi | Skąd |
 |---|---|---|
@@ -127,6 +166,9 @@ Lekcja dokłada do 4 elementów należnych dziś z wcześniejszych lekcji.
 | **Złap wszystkie słowa** | bąbelki z kategorią do wyłapania | rozładowanie w środku rundy |
 | **Policz po angielsku** | `eight + two = ?` z angielskimi liczebnikami | Karta pracy 1A, zadanie 3 |
 | **Dialog z luką** | cała rozmowa z pakietu, jedna kwestia wycięta | piątkowa scenka |
+| **Wybierz właściwą formę** | `My sister ___ an apple every day.` → plays / play / playing | odmiana czasownika |
+| **Odmień czasownik** | trzy formy naraz: on/ona · teraz · wczoraj | tabelka odmiany |
+| **Kiedy to się dzieje?** | zdanie → codziennie / teraz / wczoraj | rozpoznawanie czasu |
 
 Wszystko działa **przez dotknięcie, nie przeciąganie**. Na tablecie przeciąganie zawsze kończy się
 zgubionym elementem; stuknięcie działa identycznie palcem i myszą.
@@ -211,9 +253,9 @@ Dźwięk błędu jest celowo miękki i niski — ma informować, nie karcić.
 ```
 src/
 ├── types.ts             wspólne typy
-├── content/             words.ts · sentences.ts · dialogs.ts · worlds.ts (+ walidator id)
-├── engine/              srs · difficulty · distractors · lessonBuilder · retry · scoring · random
-├── exercises/           12 komponentów, jeden plik na typ zadania
+├── content/             words.ts · verbs.ts · sentences.ts · dialogs.ts · worlds.ts (+ walidator)
+├── engine/              srs · difficulty · distractors · lessonBuilder · verbDrills · retry · scoring
+├── exercises/           15 komponentów, jeden plik na typ zadania
 ├── store/               useGame (Zustand) · persist (IndexedDB)
 ├── audio/               tts · sfx
 ├── ui/                  kit.tsx
@@ -223,7 +265,10 @@ src/
 `buildRound(round, ctx)` składa jedną rundę na żądanie, a nie całą lekcję z góry —
 dzięki temu runda 4 widzi już postępy z rundy 1 i dobiera trudność na bieżąco.
 
-`validateContent()` w trybie dev wypisuje literówki w id i słowa nieprzypisane do żadnej lekcji.
+`validateContent()` w trybie dev wypisuje: literówki w id, słowa i zdania nieprzypisane do
+żadnej lekcji, słowa wprowadzone dwa razy, lekcje bez zdań, odmiany wskazujące na nieznane słowo
+i — najważniejsze — **zdania używające materiału z późniejszego tygodnia**. Przy 450 słowach
+ręczne pilnowanie kolejności wprowadzania przestaje działać.
 
 ### Dostępność
 Przyciski min. 48 px · opcja czcionki dla dyslektyków · kolor nigdy nie jest jedynym nośnikiem
@@ -292,7 +337,8 @@ etapu 2 bardziej niż jakikolwiek plan.
 
 | Ryzyko | Reakcja |
 |---|---|
-| Największą robotą jest content, nie kod | 128 słów gotowych; kolejne partie jako TS z walidatorem id |
+| Największą robotą jest content, nie kod | 450 słów i 63 odmiany gotowe; kolejne partie jako TS z walidatorem |
+| Emoji nie wystarczą dla ~200 pozycji (czasowniki, przymiotniki, przyimki) | część rozwiązana kombinacjami dwóch emoji; docelowo OpenMoji — patrz ROZSZERZENIE.md §6 |
 | Głosy Web Speech API różnią się między systemami | wybór głosu i tempa w ustawieniach profilu |
 | Emoji nie pokażą wszystkiego (`under the table`) | frazy pytamy przez polski, nie przez obrazek; docelowo OpenMoji |
 | Dziecko klika na oślep dla kryształów | pełne XP tylko za pierwsze przejście; gwiazdki zależą od skuteczności |

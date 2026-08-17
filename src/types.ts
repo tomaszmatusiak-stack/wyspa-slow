@@ -4,6 +4,7 @@ export type Tier = 1 | 2 | 3
 export type Box = 0 | 1 | 2 | 3 | 4 | 5
 
 export type WordCategory =
+  // tygodnie 1–4 (pakiet „Angielski na wakacje")
   | 'greetings'
   | 'family'
   | 'numbers'
@@ -19,6 +20,24 @@ export type WordCategory =
   | 'clothes'
   | 'places'
   | 'shopping'
+  // tygodnie 5–12
+  | 'school'
+  | 'subjects'
+  | 'time'
+  | 'routine'
+  | 'frequency'
+  | 'body'
+  | 'health'
+  | 'animals'
+  | 'food2'
+  | 'table'
+  | 'house'
+  | 'prepositions'
+  | 'looks'
+  | 'clothes2'
+  | 'seasons'
+  | 'weather2'
+  | 'actions'
 
 export interface Word {
   id: string
@@ -30,6 +49,35 @@ export interface Word {
   worldId: number
   /** Frazy nie nadają się do literowania ani do „wpisz z klawiatury". */
   kind: 'word' | 'phrase'
+}
+
+/** Trzy najprostsze czasy — tyle, ile potrzebuje dziecko na poziomie A1. */
+export type Tense = 'present' | 'continuous' | 'past'
+
+/**
+ * Odmiana czasownika. Osobna tabela, bo z czterech form da się **wygenerować**
+ * setki poprawnych zdań do ćwiczeń — bez pisania każdego z ręki.
+ * `wordId` wskazuje na wpis w WORDS, żeby słownictwo miało jedno źródło prawdy.
+ */
+export interface Verb {
+  wordId: string
+  base: string
+  /** Forma dla he / she / it. */
+  third: string
+  ing: string
+  past: string
+  irregular: boolean
+  /** Naturalne dopełnienie do generowanych zdań, np. „football" dla play. Może być puste. */
+  complement: string
+  /**
+   * Czasownik stanu (know, want, need). Nie występuje w present continuous —
+   * „I am knowing" to błąd, którego generator nie może wyprodukować.
+   */
+  stative?: boolean
+  /** Gdy „every day" brzmi nienaturalnie („He lives in Poland every day"), zostaje puste. */
+  noPresentMarker?: boolean
+  /** Podmiot inny niż osoba, np. „My leg hurts" albo „The bird flies". */
+  subjects?: string[]
 }
 
 export interface Sentence {
@@ -135,6 +183,9 @@ export type ExerciseKind =
   | 'bubbles'
   | 'math'
   | 'dialog'
+  | 'verbForm'
+  | 'verbTable'
+  | 'tenseSort'
 
 interface TaskBase {
   /** Unikalny w obrębie kolejki — klucz Reacta i identyfikator w lapse queue. */
@@ -245,6 +296,32 @@ export interface MathTask extends TaskBase {
   answer: string
 }
 
+/** „He ___ football every day." — wybierz właściwą formę czasownika. */
+export interface VerbFormTask extends TaskBase {
+  kind: 'verbForm'
+  verb: Verb
+  word: Word
+  tense: Tense
+  /** Gotowe zdanie z „___" w miejscu luki. */
+  prompt: string
+  answer: string
+  options: string[]
+}
+
+/** Trzy formy jednego czasownika naraz — klasyczna tabelka odmiany. */
+export interface VerbTableTask extends TaskBase {
+  kind: 'verbTable'
+  verb: Verb
+  word: Word
+  pool: string[]
+}
+
+/** Kiedy to się dzieje? Sortowanie zdań na codziennie / teraz / wczoraj. */
+export interface TenseSortTask extends TaskBase {
+  kind: 'tenseSort'
+  items: { sentence: string; tense: Tense }[]
+}
+
 export type Task =
   | ListenPickTask
   | PictureQuizTask
@@ -258,6 +335,9 @@ export type Task =
   | BubblesTask
   | MathTask
   | DialogTask
+  | VerbFormTask
+  | VerbTableTask
+  | TenseSortTask
 
 // ——— rundy w lekcji ———
 

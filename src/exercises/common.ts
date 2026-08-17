@@ -28,4 +28,7 @@ export const PROMPTS = {
   bubbles: 'Złap wszystkie słowa',
   math: 'Policz po angielsku',
   dialog: 'Czego brakuje w rozmowie?',
+  verbForm: 'Wybierz właściwą formę',
+  verbTable: 'Odmień czasownik',
+  tenseSort: 'Kiedy to się dzieje?',
 } as const

@@ -1,10 +1,14 @@
 # Wyspa Słów ⚽
 
 Grywalizowany dodatek do nauki angielskiego dla dzieci 8–11 lat, od zera.
-Towarzysz do czterotygodniowego planu „Angielski na wakacje": cztery krainy odpowiadają
-tygodniom, a lekcje kolejnym dniom roboczym.
+Towarzysz do czterotygodniowego planu „Angielski na wakacje", rozbudowany do **12 tygodni**:
+krainy odpowiadają tygodniom, a lekcje kolejnym dniom roboczym.
 
-**20 lekcji dziennych · 60 zadań w każdej · 12 typów zadań · 128 słów i zwrotów · 52 zdania · 4 dialogi**
+Tygodnie 1–4 to pakiet wakacyjny (przedstawianie się, dom i jedzenie, sport, wakacje).
+Tygodnie 5–12 prowadzą dalej: szkoła, plan dnia i godziny, ciało i zdrowie, zwierzęta,
+restauracja, przyimki miejsca, wygląd i ubrania, pory roku.
+
+**60 lekcji dziennych · 60 zadań w każdej · 15 typów zadań · 450 słów i zwrotów · 63 czasowniki z pełną odmianą · 108 zdań · 4 dialogi**
 
 ## Jak to działa
 
@@ -22,7 +26,23 @@ można przerwać w połowie i wrócić następnego dnia.
 
 Typy zadań: posłuchaj i wskaż · quiz obrazkowy · memory · połącz w pary · puzzle zdaniowe ·
 uzupełnij zdanie · literowanie · co tu nie pasuje · sortowanie do koszyków · złap słowa ·
-policz po angielsku · dialog z luką.
+policz po angielsku · dialog z luką · wybierz właściwą formę · odmień czasownik ·
+kiedy to się dzieje.
+
+## Gramatyka
+
+Osobna tabela odmian: **63 czasowniki × 4 formy** (base, he/she, -ing, past). Generator składa
+z nich zdania sam, więc kilkadziesiąt wierszy tabeli daje setki celowanych zadań.
+
+| Czas | Marker | Etykieta | Od tygodnia |
+|---|---|---|---|
+| present simple | `every day` | 🔁 codziennie | 3 |
+| present continuous | `now` | ⏱️ teraz | 6 |
+| past simple | `yesterday` | ⬅️ wczoraj | 9 |
+
+Generator nie produkuje złego angielskiego: czasowniki stanu (`know`, `want`, `need`) nie
+dostają continuous, `hurt` i `fly` dostają podmiot nieosobowy („My leg hurts", „The bird flies"),
+a czasowniki, do których „every day" nie pasuje, zostają bez markera.
 
 ## Dwa profile, dwa poziomy
 

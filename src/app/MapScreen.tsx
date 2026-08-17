@@ -12,6 +12,12 @@ const HUE: Record<string, { band: string; node: string; shadow: string; text: st
   emerald: { band: 'from-emerald-200 to-emerald-100', node: 'bg-emerald-400', shadow: '[--chunky-shadow:var(--color-emerald-600)]', text: 'text-emerald-900' },
   sky: { band: 'from-sky-200 to-sky-100', node: 'bg-sky-400', shadow: '[--chunky-shadow:var(--color-sky-600)]', text: 'text-sky-900' },
   fuchsia: { band: 'from-fuchsia-200 to-fuchsia-100', node: 'bg-fuchsia-400', shadow: '[--chunky-shadow:var(--color-fuchsia-600)]', text: 'text-fuchsia-900' },
+  rose: { band: 'from-rose-200 to-rose-100', node: 'bg-rose-400', shadow: '[--chunky-shadow:var(--color-rose-600)]', text: 'text-rose-900' },
+  cyan: { band: 'from-cyan-200 to-cyan-100', node: 'bg-cyan-400', shadow: '[--chunky-shadow:var(--color-cyan-600)]', text: 'text-cyan-900' },
+  orange: { band: 'from-orange-200 to-orange-100', node: 'bg-orange-400', shadow: '[--chunky-shadow:var(--color-orange-600)]', text: 'text-orange-900' },
+  lime: { band: 'from-lime-200 to-lime-100', node: 'bg-lime-400', shadow: '[--chunky-shadow:var(--color-lime-600)]', text: 'text-lime-900' },
+  teal: { band: 'from-teal-200 to-teal-100', node: 'bg-teal-400', shadow: '[--chunky-shadow:var(--color-teal-600)]', text: 'text-teal-900' },
+  violet: { band: 'from-violet-200 to-violet-100', node: 'bg-violet-400', shadow: '[--chunky-shadow:var(--color-violet-600)]', text: 'text-violet-900' },
 }
 
 export function MapScreen({ onStart }: { onStart: (lessonId: string) => void }) {

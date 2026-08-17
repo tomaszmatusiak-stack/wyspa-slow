@@ -1,5 +1,13 @@
-import type { ItemProgress, Lesson, Task, Tier, Word, WordCategory } from '../types'
+import type { ItemProgress, Lesson, Task, Tense, Tier, Verb, Word, WordCategory } from '../types'
 import { CATEGORY_LABEL, NUMBER_WORDS, WORDS, getWord } from '../content/words'
+import { VERB_BY_WORD } from '../content/verbs'
+import {
+  makeDrill,
+  makeTablePool,
+  makeTenseTriplet,
+  tensesForVerb,
+  verbsForWords,
+} from './verbDrills'
 import { getSentence } from '../content/sentences'
 import { DIALOGS, DIALOG_BY_ID } from '../content/dialogs'
 import { ALL_LESSONS, lessonIndex } from '../content/worlds'
@@ -49,6 +57,10 @@ interface Material {
   pool: Word[]
   known: Word[]
   numbersKnown: boolean
+  /** Czasowniki z odmianą dostępne w tej lekcji (nowe + wcześniej poznane). */
+  verbs: Verb[]
+  /** Czasowniki wprowadzone właśnie teraz — one dostają tabelkę odmiany. */
+  newVerbs: Verb[]
   tier: (w: Word) => Tier
   ctx: BuildContext
 }
@@ -89,6 +101,8 @@ function prepare(ctx: BuildContext): Material {
     pool,
     known,
     numbersKnown: knownIds.has('numbers.10'),
+    verbs: verbsForWords(known, VERB_BY_WORD),
+    newVerbs: verbsForWords(newWords, VERB_BY_WORD),
     tier: (w) => tierFor(progress.get(w.id), maxTier),
     ctx,
   }
@@ -317,6 +331,55 @@ function math(m: Material): Task | null {
   }
 }
 
+// ——— zadania z odmian czasowników (treść generowana, nie pisana z ręki)
+
+function verbForm(m: Material, verb: Verb, tense: Tense): Task {
+  const drill = makeDrill(verb, tense)
+  return {
+    key: key('vf'),
+    kind: 'verbForm',
+    tier: Math.min(2, m.ctx.maxTier) as Tier,
+    // Postęp liczymy na parze czasownik+czas, żeby SRS pilnował każdego czasu osobno.
+    itemIds: [`${verb.wordId}#${tense}`],
+    isReview: false,
+    verb,
+    word: getWord(verb.wordId),
+    tense,
+    prompt: drill.prompt,
+    answer: drill.answer,
+    options: drill.options,
+  }
+}
+
+function verbTable(m: Material, verb: Verb): Task {
+  return {
+    key: key('vt'),
+    kind: 'verbTable',
+    tier: Math.min(2, m.ctx.maxTier) as Tier,
+    itemIds: [`${verb.wordId}#forms`],
+    isReview: false,
+    verb,
+    word: getWord(verb.wordId),
+    pool: makeTablePool(verb, m.verbs),
+  }
+}
+
+function tenseSort(m: Material): Task | null {
+  const usable = m.verbs.filter((v) => !v.noPresentMarker && !v.stative)
+  if (usable.length < 2) return null
+  const chosen = sample(usable, 2)
+  const items = shuffle(chosen.flatMap(makeTenseTriplet)).slice(0, 5)
+  if (items.length < 3) return null
+  return {
+    key: key('ts'),
+    kind: 'tenseSort',
+    tier: 2,
+    itemIds: chosen.map((v) => `${v.wordId}#tense`),
+    isReview: false,
+    items,
+  }
+}
+
 function dialogTasks(m: Material, count: number): Task[] {
   const dialog = m.ctx.lesson.dialogId ? DIALOG_BY_ID.get(m.ctx.lesson.dialogId) : undefined
   if (!dialog) return []
@@ -366,7 +429,9 @@ const ROUND_BUILDERS: RoundBuilder[] = [
     const recall = m.focus.map((w) => quiz(m, w, 'pl2word'))
     const spell = m.focus.map((w) => spelling(m, w)).filter(Boolean) as Task[]
     const games = [oddOneOut(m), bubbles(m), memory(m, m.focus, 'pic-en')].filter(Boolean) as Task[]
-    const out = interleave([recall, spell])
+    // Nowy czasownik dostaje tabelkę odmiany od razu, w rundzie utrwalania.
+    const tables = m.newVerbs.slice(0, 2).map((v) => verbTable(m, v))
+    const out: (Task | null)[] = interleave([recall, spell, tables])
     games.forEach((g, i) => out.splice(Math.min(3 + i * 4, out.length), 0, g))
     return out
   },
@@ -376,25 +441,48 @@ const ROUND_BUILDERS: RoundBuilder[] = [
     const ids = m.ctx.lesson.sentences
     const builders = ids.map((id) => sentence(m, id))
     const gaps = ids.map((id) => fillGap(m, id))
-    const extra = ids.length < 3 ? ids.map((id) => sentence(m, id)) : []
-    return [...interleave([builders, gaps, extra]), ...dialogTasks(m, 3)]
+    const allowed = tensesFor(m.ctx.lesson.worldId)
+    // Z jednego czasownika robimy tyle zadań, ile czasów już znamy —
+    // pomijając te, w których dany czasownik nie występuje (np. „I am knowing").
+    const forms = (m.newVerbs.length ? m.newVerbs : m.verbs.slice(-3)).flatMap((v) =>
+      tensesForVerb(v, allowed).map((t) => verbForm(m, v, t)),
+    )
+    return [...interleave([builders, gaps, forms]), ...dialogTasks(m, 3)]
   },
 
   // ——— Mistrz
   (m) => {
     const reviews = m.recap.map((w) => quiz(m, w, m.tier(w) === 1 ? 'pic2word' : 'pl2word', true))
     const drills = m.focus.map((w) => quiz(m, w, 'word2pic'))
+    const tenses = tensesFor(m.ctx.lesson.worldId)
+    const forms = sample(m.verbs, 3).flatMap((v) =>
+      tensesForVerb(v, tenses).map((t) => verbForm(m, v, t)),
+    )
     return [
       match([...m.focus, ...m.recap], 'en-pl'),
       ...interleave([reviews, drills]).slice(0, 4),
       sorting(m),
+      // Sortowanie po czasach ma sens dopiero, gdy dziecko zna więcej niż jeden czas.
+      tenses.length > 1 ? tenseSort(m) : null,
       memory(m, [...m.focus, ...m.recap], m.ctx.maxTier >= 3 ? 'en-pl' : 'pic-en'),
       math(m),
-      ...interleave([reviews.slice(2), drills.slice(2)]).slice(0, 3),
+      ...interleave([reviews.slice(2), drills.slice(2), forms]).slice(0, 4),
       bubbles(m),
     ]
   },
 ]
+
+/**
+ * Czasy wprowadzamy stopniowo: najpierw present simple, potem continuous, na końcu past.
+ * Bez tego dziecko dostawałoby trzy czasy naraz w tygodniu, w którym dopiero poznaje
+ * pierwsze czasowniki.
+ */
+function tensesFor(worldId: number): Tense[] {
+  const out: Tense[] = ['present']
+  if (worldId >= 6) out.push('continuous')
+  if (worldId >= 9) out.push('past')
+  return out
+}
 
 /** Dopycha rundę mieszanymi quizami, żeby nawet lekcja z dwoma zwrotami trwała pełne 11 minut. */
 function padTo(tasks: Task[], target: number, m: Material): Task[] {
