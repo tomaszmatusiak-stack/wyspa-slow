@@ -1,6 +1,6 @@
 # Wyspa Słów — angielski dla dzieci przez grywalizację
 
-Dokument projektowy · wersja 5.0 (sprawdzian na koniec dnia, grafika OpenMoji)
+Dokument projektowy · wersja 5.1 (regulowany poziom wyzwania)
 Stan: **Etap 1 zbudowany i zweryfikowany w przeglądarce.**
 
 ---
@@ -159,6 +159,24 @@ ustnie zamiast pisać. 10-latek: pisze i układa własne zdania"), więc profil 
 
 Do przestawienia ręcznie w ustawieniach.
 
+### 3.2a Poziom wyzwania — druga, niezależna oś
+
+`maxTier` odpowiada na pytanie „czy dziecko pisze". **Poziom wyzwania** odpowiada na inne:
+„ile jest opcji do wyboru i ile pułapek". To dwie różne rzeczy — 8-latek może nie chcieć pisać,
+a jednocześnie nudzić się przy trzech opcjach.
+
+| | Spokojny | **Normalny** (domyślny) | Ambitny |
+|---|---|---|---|
+| opcji przy T1 / T2 / T3 | 3 / 4 / 5 | **4 / 5 / 6** | 5 / 6 / 8 |
+| klocków-pułapek w zdaniu (T1/T2/T3) | 0 / 2 / 4 | **1 / 3 / 6** | 3 / 5 / 8 |
+| zbędnych liter w literowaniu | 0 / 2 / 3 | **1 / 3 / 4** | 2 / 4 / 5 |
+| par w memory | 3–5 | **4–6** | 5–6 |
+| podpowiedź PL przy pierwszym kontakcie | tak | **tak** | nie |
+| ułatwianie po serii błędów | po 3 | **po 4** | nigdy |
+
+Gdy zdanie ma mniej własnych pułapek niż wymaga poziom, generator dosypuje słówka funkcyjne
+(`is/are`, `a/an`, `my/your`) — nie zostawia rundy łatwiejszej niż ustawiono.
+
 ### 3.2b Odmiany czasowników i trzy czasy
 
 Osobna tabela `src/content/verbs.ts`: **63 czasowniki × 4 formy** (base, he/she, -ing, past).
@@ -241,7 +259,11 @@ Dystraktor zawsze z tej samej kategorii semantycznej. `dog → cat, horse` uczy;
 `dog → blue, run, table` uczy tylko eliminowania bzdur.
 W zdaniach pułapki są konkretne: `is/are`, `a/an`, `my/your`, `can/can't`, `like/likes`.
 W literowaniu litery mylone przez polskie dzieci: `c/k`, `s/z`, `f/v`, `i/y`, `b/p`.
-W pierwszych lekcjach, gdy znanych słów jest za mało, dobieramy z bieżącej krainy — nigdy z całego materiału.
+Kategoria jest brana z **całego materiału**, nie tylko ze słów już poznanych. Wcześniej było
+odwrotnie i w pierwszej lekcji dawało to wybór „hi albo hello" — bo znanych słów było osiem,
+wszystkie z jednej kategorii. Nieznane słowo jako błędna opcja niczego nie psuje: i tak jest błędne,
+a wybór przestaje być trywialny. Kolejność preferencji: znane z tej kategorii → cała kategoria →
+znane z krainy → cała kraina → cokolwiek.
 
 ---
 

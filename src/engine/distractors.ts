@@ -1,28 +1,61 @@
-import type { Dialog, Sentence, Tier, Word } from '../types'
+import type { Dialog, Sentence, Word } from '../types'
 import { pick, sample, shuffle, shuffleDifferent } from './random'
+
+/** Słówka funkcyjne, na których polskie dzieci najczęściej się przewracają. */
+const GRAMMAR_TOKENS = new Set([
+  'is', 'are', 'am', 'a', 'an', 'the', 'my', 'your', 'his', 'her',
+  'do', "don't", 'does', 'can', "can't", 'in', 'on', 'and', 'to', 'not', 'like', 'likes',
+])
+
+const FILLER_TOKENS = ['is', 'are', 'am', 'a', 'an', 'the', 'my', 'your', 'do', 'can', "can't", 'in', 'on', 'and']
+
+const clean = (t: string) => t.toLowerCase().replace(/[^a-z']/g, '')
+
 
 /**
  * Dobór błędnych odpowiedzi decyduje o tym, czy dziecko się uczy, czy zgaduje.
- * Zasada: dystraktor zawsze z tej samej kategorii semantycznej.
- * "dog → cat, horse" uczy. "dog → blue, run, table" uczy tylko eliminowania bzdur.
+ * Zasada: dystraktor z tej samej kategorii semantycznej.
+ * „dog → cat, horse" uczy. „dog → blue, run, table" uczy tylko eliminowania bzdur.
+ *
+ * Kategoria jest brana z **całego materiału**, nie tylko ze słów już poznanych.
+ * Wcześniej było odwrotnie i w pierwszej lekcji dawało to wybór „hi albo hello" —
+ * bo znanych słów było osiem, wszystkie z jednej kategorii. Nieznane słowo jako
+ * błędna opcja niczego nie psuje: i tak jest błędne.
  */
-export function wordDistractors(target: Word, pool: readonly Word[], count: number): Word[] {
-  const notTarget = pool.filter((w) => w.id !== target.id)
-
-  const sameCategory = notTarget.filter((w) => w.category === target.category)
-  const sameWorld = notTarget.filter((w) => w.category !== target.category && w.worldId === target.worldId)
-  const rest = notTarget.filter((w) => w.category !== target.category && w.worldId !== target.worldId)
-
+export function wordDistractors(
+  target: Word,
+  known: readonly Word[],
+  all: readonly Word[],
+  count: number,
+): Word[] {
   const out: Word[] = []
-  for (const bucket of [sameCategory, sameWorld, rest]) {
-    if (out.length >= count) break
-    out.push(...sample(bucket, count - out.length))
+  const taken = new Set([target.id])
+
+  const add = (bucket: readonly Word[]) => {
+    if (out.length >= count) return
+    for (const w of sample(bucket.filter((x) => !taken.has(x.id)), count - out.length)) {
+      taken.add(w.id)
+      out.push(w)
+    }
   }
+
+  // Kolejność od najbardziej pouczających: znane z tej kategorii → cała kategoria →
+  // znane z krainy → cała kraina → cokolwiek.
+  add(known.filter((w) => w.category === target.category))
+  add(all.filter((w) => w.category === target.category))
+  add(known.filter((w) => w.worldId === target.worldId))
+  add(all.filter((w) => w.worldId === target.worldId))
+  add(all)
   return out
 }
 
-export function quizOptions(target: Word, pool: readonly Word[], count: number): Word[] {
-  return shuffle([target, ...wordDistractors(target, pool, count - 1)])
+export function quizOptions(
+  target: Word,
+  known: readonly Word[],
+  all: readonly Word[],
+  count: number,
+): Word[] {
+  return shuffle([target, ...wordDistractors(target, known, all, count - 1)])
 }
 
 /** Litery, które polskie dziecko myli przy zapisie angielskiego. */
@@ -55,11 +88,11 @@ const ALPHABET = 'abcdefghijklmnoprstuwy'.split('')
  * Kafelki liter do literowania. T1 — dokładnie litery słowa.
  * T2 — plus 2–3 litery-pułapki (najpierw te mylone, potem losowe spoza słowa).
  */
-export function letterTiles(word: string, tier: Tier): string[] {
+export function letterTiles(word: string, noise: number): string[] {
   const letters = word.toLowerCase().replace(/[^a-z]/g, '').split('')
-  if (tier <= 1) return shuffleDifferent(letters)
+  if (noise <= 0) return shuffleDifferent(letters)
 
-  const extraCount = tier === 2 ? 2 : 3
+  const extraCount = noise
   const inWord = new Set(letters)
   const candidates = new Set<string>()
 
@@ -77,23 +110,24 @@ export function letterTiles(word: string, tier: Tier): string[] {
 }
 
 /**
- * Klocki do układania zdania. Liczba pułapek rośnie z tierem;
- * w T1 dziecko dostaje dokładnie to, czego potrzebuje.
+ * Klocki do układania zdania. Liczba pułapek zależy od tieru i poziomu wyzwania —
+ * przy „spokojnym" T1 dziecko dostaje dokładnie tyle klocków, ile potrzebuje,
+ * przy „ambitnym" nawet pierwsze zdanie ma pułapki.
+ *
+ * Gdy zdanie ma mniej własnych dystraktorów niż trzeba, dosypujemy słówka funkcyjne.
  */
-export function sentencePool(sentence: Sentence, tier: Tier): string[] {
-  const extras = tier === 1 ? 0 : tier === 2 ? 2 : sentence.distractors.length
-  return shuffleDifferent([...sentence.tokens, ...sentence.distractors.slice(0, extras)])
+export function sentencePool(sentence: Sentence, extras: number): string[] {
+  const own = sentence.distractors.slice(0, extras)
+  const taken = new Set([...sentence.tokens, ...own].map(clean))
+  const filler =
+    own.length < extras
+      ? sample(
+          FILLER_TOKENS.filter((t) => !taken.has(clean(t))),
+          extras - own.length,
+        )
+      : []
+  return shuffleDifferent([...sentence.tokens, ...own, ...filler])
 }
-
-/** Słówka funkcyjne, na których polskie dzieci najczęściej się przewracają. */
-const GRAMMAR_TOKENS = new Set([
-  'is', 'are', 'am', 'a', 'an', 'the', 'my', 'your', 'his', 'her',
-  'do', "don't", 'does', 'can', "can't", 'in', 'on', 'and', 'to', 'not', 'like', 'likes',
-])
-
-const FILLER_TOKENS = ['is', 'are', 'am', 'a', 'an', 'the', 'my', 'your', 'do', 'can', "can't", 'in', 'on', 'and']
-
-const clean = (t: string) => t.toLowerCase().replace(/[^a-z']/g, '')
 
 /**
  * Luka trafia w słowo funkcyjne, jeśli takie w zdaniu jest —

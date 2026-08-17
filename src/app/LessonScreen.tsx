@@ -4,7 +4,7 @@ import type { Task } from '../types'
 import { ROUNDS, ROUND_COUNT } from '../types'
 import { LESSON_BY_ID } from '../content/worlds'
 import { TEST_SIZE, buildRound, buildTest } from '../engine/lessonBuilder'
-import { SessionMood } from '../engine/difficulty'
+import { SessionMood, rulesFor } from '../engine/difficulty'
 import { RETRY_SUFFIX, retryTask } from '../engine/retry'
 import { progressMapFor, roundsDone, useGame } from '../store/useGame'
 import { play } from '../audio/sfx'
@@ -57,6 +57,9 @@ export function LessonScreen({
   const maxTier = useGame(
     (s) => s.profiles.find((p) => p.id === s.activeProfileId)?.settings.maxTier ?? 2,
   )
+  const challenge = useGame(
+    (s) => s.profiles.find((p) => p.id === s.activeProfileId)?.settings.challenge ?? 'normalny',
+  )
 
   // Wznawiamy od rundy, na której dziecko skończyło poprzednio.
   const [round, setRound] = useState(() => {
@@ -76,7 +79,8 @@ export function LessonScreen({
     null,
   )
 
-  const mood = useMemo(() => new SessionMood(), [])
+  // Na poziomie ambitnym apka nie ułatwia po serii błędów — o to właśnie chodzi.
+  const mood = useMemo(() => new SessionMood(rulesFor(challenge).easeAfterErrors), [challenge])
   const roundStartedAt = useRef(Date.now())
   const roundTasks = useRef(0)
   const roundErrors = useRef(0)
@@ -92,6 +96,7 @@ export function LessonScreen({
       lesson,
       progress: progressMapFor(s, s.activeProfileId!),
       maxTier,
+      challenge,
       now: Date.now(),
     }
     return r >= TEST_PHASE ? buildTest(ctx) : buildRound(r, ctx)

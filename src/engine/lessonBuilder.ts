@@ -1,4 +1,14 @@
-import type { ItemProgress, Lesson, Task, Tense, Tier, Verb, Word, WordCategory } from '../types'
+import type {
+  Challenge,
+  ItemProgress,
+  Lesson,
+  Task,
+  Tense,
+  Tier,
+  Verb,
+  Word,
+  WordCategory,
+} from '../types'
 import { CATEGORY_LABEL, NUMBER_WORDS, WORDS, getWord } from '../content/words'
 import { VERB_BY_WORD } from '../content/verbs'
 import {
@@ -11,7 +21,8 @@ import {
 import { getSentence } from '../content/sentences'
 import { DIALOGS, DIALOG_BY_ID } from '../content/dialogs'
 import { ALL_LESSONS, lessonIndex } from '../content/worlds'
-import { optionCount, tierFor } from './difficulty'
+import { optionCount, rulesFor, tierFor } from './difficulty'
+import type { ChallengeRules } from './difficulty'
 import {
   dialogOptions,
   gapOptions,
@@ -37,6 +48,7 @@ export interface BuildContext {
   lesson: Lesson
   progress: Map<string, ItemProgress>
   maxTier: Tier
+  challenge: Challenge
   now: number
 }
 
@@ -54,8 +66,9 @@ interface Material {
    * więc dobieramy wcześniej poznane słowa — inaczej ostatnia runda byłaby samym wypełniaczem.
    */
   recap: Word[]
-  pool: Word[]
   known: Word[]
+  /** Reguły poziomu wyzwania — ile opcji, ile pułapek, czy apka ułatwia. */
+  rules: ChallengeRules
   numbersKnown: boolean
   /** Czasowniki z odmianą dostępne w tej lekcji (nowe + wcześniej poznane). */
   verbs: Verb[]
@@ -73,8 +86,6 @@ function prepare(ctx: BuildContext): Material {
     ALL_LESSONS.filter((l) => lessonIndex(l.id) <= idx).flatMap((l) => l.newWords),
   )
   const known = WORDS.filter((w) => knownIds.has(w.id))
-  const sameWorld = WORDS.filter((w) => w.worldId === lesson.worldId)
-  const pool = known.length >= 8 ? known : sameWorld.length >= 8 ? sameWorld : WORDS
 
   // Krótkie lekcje (np. 2 nowe zwroty) uzupełniamy najświeższymi znanymi słowami,
   // żeby każda runda miała z czego budować zadania.
@@ -98,8 +109,8 @@ function prepare(ctx: BuildContext): Material {
     focus,
     review,
     recap,
-    pool,
     known,
+    rules: rulesFor(ctx.challenge),
     numbersKnown: knownIds.has('numbers.10'),
     verbs: verbsForWords(known, VERB_BY_WORD),
     newVerbs: verbsForWords(newWords, VERB_BY_WORD),
@@ -118,7 +129,7 @@ function listenPick(m: Material, w: Word): Task {
     itemIds: [w.id],
     isReview: false,
     word: w,
-    options: quizOptions(w, m.pool, 3),
+    options: quizOptions(w, m.known, WORDS, m.rules.options[1]),
   }
 }
 
@@ -138,7 +149,7 @@ function quiz(
     itemIds: [w.id],
     isReview,
     word: w,
-    options: quizOptions(w, m.pool, optionCount(t)),
+    options: quizOptions(w, m.known, WORDS, optionCount(t, m.ctx.challenge)),
     mode: safeMode,
   }
 }
@@ -146,7 +157,7 @@ function quiz(
 function memory(m: Material, words: Word[], variant: 'pic-en' | 'en-pl'): Task | null {
   const usable = words.filter((w) => w.kind === 'word')
   if (usable.length < 3) return null
-  const picked = sample(usable, Math.min(m.ctx.maxTier >= 3 ? 5 : 4, usable.length))
+  const picked = sample(usable, Math.min(m.rules.memoryPairs[m.ctx.maxTier], usable.length))
   return {
     key: key('mem'),
     kind: 'memory',
@@ -183,8 +194,8 @@ function sentence(m: Material, id: string): Task {
     itemIds: [s.id],
     isReview: false,
     sentence: s,
-    pool: sentencePool(s, t),
-    showHint: t === 1,
+    pool: sentencePool(s, m.rules.sentenceExtras[t]),
+    showHint: t === 1 && m.rules.hintAtT1,
   }
 }
 
@@ -214,7 +225,7 @@ function spelling(m: Material, w: Word): Task | null {
     itemIds: [w.id],
     isReview: false,
     word: w,
-    letters: mode === 'tiles' ? letterTiles(w.en, t) : [],
+    letters: mode === 'tiles' ? letterTiles(w.en, m.rules.spellingNoise[t]) : [],
     mode,
   }
 }
@@ -534,7 +545,7 @@ export function buildTest(ctx: BuildContext): Task[] {
       // Na sprawdzianie zdanie idzie bez podpowiedzi i z pełnym zestawem pułapek.
       if (t.kind === 'sentence') {
         t.showHint = false
-        t.pool = sentencePool(t.sentence, 3)
+        t.pool = sentencePool(t.sentence, m.rules.sentenceExtras[3])
       }
       return t
     }),

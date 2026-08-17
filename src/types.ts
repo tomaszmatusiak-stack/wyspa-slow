@@ -145,12 +145,17 @@ export interface ItemProgress {
   tier: Tier
 }
 
+/** Poziom wyzwania — niezależny od wieku, do podkręcenia gdy dziecku jest za łatwo. */
+export type Challenge = 'spokojny' | 'normalny' | 'ambitny'
+
 export interface ProfileSettings {
   sounds: boolean
   voice: string | null
   rate: number
   /** 8-latek: 2 (mówi i słucha, klocki zamiast klawiatury). 10-latek: 3 (pisze). */
   maxTier: Tier
+  /** Ile opcji, ile pułapek, czy apka ułatwia po błędach. */
+  challenge: Challenge
   dailyGoal: 1 | 2 | 3
   dyslexiaFont: boolean
 }

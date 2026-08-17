@@ -77,6 +77,7 @@ export function defaultSettings(age: number): ProfileSettings {
     rate: 0.85,
     // Zgodnie z planem: młodsze dziecko mówi i słucha, starsze dodatkowo pisze.
     maxTier: age >= 10 ? 3 : 2,
+    challenge: 'normalny',
     // Jedna lekcja to cały dzień z planu (~45 min), więc domyślny cel to jedna.
     dailyGoal: 1,
     dyslexiaFont: false,
@@ -137,7 +138,13 @@ export const useGame = create<GameState>((set, get) => ({
 
   hydrate: async () => {
     const data = await kvGet<SaveData>(SAVE_KEY)
-    set({ ...EMPTY, ...data, ready: true })
+    // Profile zapisane przed dodaniem nowego ustawienia nie mają go w ogóle —
+    // uzupełniamy brakujące pola domyślnymi, żeby stary zapis nie wywalił lekcji.
+    const profiles = (data?.profiles ?? []).map((p) => ({
+      ...p,
+      settings: { ...defaultSettings(p.age), ...p.settings },
+    }))
+    set({ ...EMPTY, ...data, profiles, ready: true })
     const active = get().profiles.find((p) => p.id === get().activeProfileId)
     setSfxEnabled(active?.settings.sounds ?? true)
   },

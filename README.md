@@ -57,6 +57,10 @@ Trudność wynika z wieku, zgodnie z planem („8-latek mówi i słucha, 10-late
 
 Powtórki działają systemem Leitnera: 1 → 3 → 7 → 14 → 30 dni.
 
+Osobno od wieku ustawia się **poziom wyzwania** (Spokojny / Normalny / Ambitny): ile opcji
+do wyboru, ile pułapek w zdaniach i literowaniu, czy jest podpowiedź po polsku i czy apka
+ułatwia po serii błędów. Domyślnie Normalny.
+
 ## Prywatność
 
 Cały postęp siedzi w `IndexedDB` w przeglądarce. Aplikacja nie ma backendu, nie wysyła

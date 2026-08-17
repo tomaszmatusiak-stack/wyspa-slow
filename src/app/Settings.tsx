@@ -4,7 +4,8 @@ import { englishVoices, isFemaleVoice } from '../audio/tts'
 import { useActiveProfile, useGame } from '../store/useGame'
 import { useSay } from './useSay'
 import { PrimaryButton, Tile } from '../ui/kit'
-import type { Tier } from '../types'
+import type { Challenge, Tier } from '../types'
+import { CHALLENGE } from '../engine/difficulty'
 
 export function Settings({ onClose }: { onClose: () => void }) {
   const profile = useActiveProfile()
@@ -94,6 +95,28 @@ export function Settings({ onClose }: { onClose: () => void }) {
           </div>
           <p className="mt-2 text-sm font-bold text-ink-soft">
             Zgodnie z planem: młodsze dziecko odpowiada ustnie i układa z klocków, starsze pisze.
+          </p>
+        </Section>
+
+        <Section title="Poziom wyzwania">
+          <div className="flex flex-col gap-2">
+            {(Object.keys(CHALLENGE) as Challenge[]).map((c) => (
+              <Tile
+                key={c}
+                state={s.challenge === c ? 'chosen' : 'idle'}
+                className="flex-col items-start gap-0.5 px-4 text-left"
+                onClick={() => update({ challenge: c })}
+              >
+                <span className="text-base font-black">{CHALLENGE[c].label}</span>
+                <span className="text-xs leading-snug font-bold opacity-70">
+                  {CHALLENGE[c].hint}
+                </span>
+              </Tile>
+            ))}
+          </div>
+          <p className="mt-2 text-sm font-bold text-ink-soft">
+            To osobna rzecz niż poziom zadań powyżej: tam decyduje, czy dziecko pisze,
+            tutaj — ile jest opcji do wyboru i pułapek.
           </p>
         </Section>
 
