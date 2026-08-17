@@ -118,9 +118,10 @@ export function MapScreen({ onStart }: { onStart: (lessonId: string) => void }) 
                             </span>
                             <span className="truncate font-black">{lesson.title}</span>
                           </span>
+                          {/* Etykiety „· dialog" nie ma — dialog jest w każdej lekcji,
+                              więc nic by nie odróżniała. */}
                           <span className="mt-0.5 flex items-center gap-2 text-xs font-bold opacity-90">
                             <span>{lesson.newWords.length} słów</span>
-                            {lesson.dialogId && <span>· dialog</span>}
                             {started > 0 && !earned && (
                               <span className="flex gap-0.5">
                                 {Array.from({ length: ROUND_COUNT }, (_, r) => (
