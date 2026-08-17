@@ -383,6 +383,8 @@ function tenseSort(m: Material): Task | null {
 function dialogTasks(m: Material, count: number): Task[] {
   const dialog = m.ctx.lesson.dialogId ? DIALOG_BY_ID.get(m.ctx.lesson.dialogId) : undefined
   if (!dialog) return []
+  // Warianty tylko z rozmów z tygodni już poznanych.
+  const scoped = DIALOGS.filter((d) => d.worldId <= m.ctx.lesson.worldId)
   return shuffle(dialog.lines.map((_, i) => i))
     .filter((i) => i > 0)
     .slice(0, count)
@@ -394,7 +396,7 @@ function dialogTasks(m: Material, count: number): Task[] {
       isReview: false,
       dialog,
       hiddenIndex,
-      options: dialogOptions(dialog, hiddenIndex, DIALOGS),
+      options: dialogOptions(dialog, hiddenIndex, scoped, DIALOGS),
     }))
 }
 
@@ -447,7 +449,11 @@ const ROUND_BUILDERS: RoundBuilder[] = [
     const forms = (m.newVerbs.length ? m.newVerbs : m.verbs.slice(-3)).flatMap((v) =>
       tensesForVerb(v, allowed).map((t) => verbForm(m, v, t)),
     )
-    return [...interleave([builders, gaps, forms]), ...dialogTasks(m, 3)]
+    // Dialog rezerwuje sobie miejsce z góry. Doklejony na końcu wypadał z rundy
+    // w lekcjach, które mają dużo zdań i czasowników.
+    const dialogs = dialogTasks(m, 3)
+    const body = interleave([builders, gaps, forms])
+    return [...body.slice(0, Math.max(0, ROUND_SIZE - dialogs.length)), ...dialogs]
   },
 
   // ——— Mistrz

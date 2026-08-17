@@ -48,7 +48,7 @@ export const WORLDS: World[] = [
       L('l1.5', 1, 'Pt', 'Nowy kolega', '🤝',
         ['family.family', 'family.friend', 'family.hisname', 'family.hername',
          'greetings.yes', 'greetings.no'],
-        ['s.w1.9', 's.w1.10', 's.w1.11'], 'd1'),
+        ['s.w1.9', 's.w1.10', 's.w1.11']),
     ],
   },
   {
@@ -76,7 +76,7 @@ export const WORLDS: World[] = [
         ['s.w2.4', 's.w2.5', 's.w2.6', 's.w2.7', 's.w2.8', 's.w2.11']),
       L('l2.5', 2, 'Pt', 'Śniadanie', '🍽️',
         ['likes.canihave', 'likes.hereyouare', 'likes.goodmorning'],
-        ['s.w2.9', 's.w2.10'], 'd2'),
+        ['s.w2.9', 's.w2.10']),
     ],
   },
   {
@@ -102,7 +102,7 @@ export const WORLDS: World[] = [
         ['s.w3.6', 's.w3.9', 's.w3.12']),
       L('l3.5', 3, 'Pt', 'Na treningu', '🏆',
         ['football.win', 'football.lose', 'football.coach'],
-        ['s.w3.10'], 'd3'),
+        ['s.w3.10']),
     ],
   },
   {
@@ -128,7 +128,7 @@ export const WORLDS: World[] = [
         ['s.w4.7', 's.w4.8', 's.w4.9']),
       L('l4.5', 4, 'Pt', 'W sklepie', '🏪',
         ['shopping.igoto', 'shopping.wheredoyougo'],
-        ['s.w4.6'], 'd4'),
+        ['s.w4.6']),
     ],
   },
 
@@ -369,6 +369,14 @@ export const WORLDS: World[] = [
 ]
 
 export const ALL_LESSONS: Lesson[] = WORLDS.flatMap((w) => w.lessons)
+
+// Każda lekcja ma dialog o id `d.<lessonId>`, więc podpinamy je automatycznie.
+// Ręczne przypisywanie 60 dialogów byłoby tylko okazją do pomyłki.
+for (const lesson of ALL_LESSONS) {
+  const dialogId = `d.${lesson.id}`
+  if (DIALOG_BY_ID.has(dialogId)) lesson.dialogId = dialogId
+}
+
 export const LESSON_BY_ID = new Map(ALL_LESSONS.map((l) => [l.id, l]))
 
 /** Kolejność odblokowywania — jedna płaska ścieżka przez wszystkie krainy. */
@@ -405,10 +413,15 @@ export function validateContent(): string[] {
       problems.push(`${lesson.id}: nieznany dialog "${lesson.dialogId}"`)
     }
     if (!lesson.sentences.length) problems.push(`${lesson.id}: lekcja bez ani jednego zdania`)
+    if (!lesson.dialogId) problems.push(`${lesson.id}: lekcja bez dialogu`)
   }
 
   for (const id of WORD_BY_ID.keys()) {
     if (!seenWord.has(id)) problems.push(`słowo "${id}" nie jest w żadnej lekcji`)
+  }
+  const usedDialogs = new Set(ALL_LESSONS.map((l) => l.dialogId))
+  for (const id of DIALOG_BY_ID.keys()) {
+    if (!usedDialogs.has(id)) problems.push(`dialog "${id}" nie jest w żadnej lekcji`)
   }
   const usedSentences = new Set(ALL_LESSONS.flatMap((l) => l.sentences))
   for (const id of SENTENCE_BY_ID.keys()) {

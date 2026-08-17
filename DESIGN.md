@@ -75,8 +75,8 @@ Mapa → Kraina (= tydzień planu) → Lekcja (= jeden dzień) → Runda (4 na l
 | 11 | **Wygląd i ubrania** | Jaki jesteś? | Włosy i okulary | Ciepłe ubrania | Codzienne ubrania | Kto co ma na sobie |
 | 12 | **Pory roku i wczoraj** | Cztery pory roku | Miesiące 1 | Miesiące 2 | Jaka pogoda? | Co było wczoraj |
 
-Zbudowane: **450 słów i zwrotów · 108 zdań · 63 czasowniki z pełną odmianą · 4 dialogi ·
-60 lekcji dziennych w 12 krainach.** Każda lekcja generuje **60 zadań** (4 rundy × 15),
+Zbudowane: **450 słów i zwrotów · 108 zdań · 63 czasowniki z pełną odmianą ·
+60 dialogów (po jednym na lekcję, 6 kwestii każdy) · 60 lekcji dziennych w 12 krainach.** Każda lekcja generuje **60 zadań** (4 rundy × 15),
 co daje **3600 zadań** w całym kursie.
 
 ### 3.1b Cztery rundy w lekcji
@@ -87,6 +87,11 @@ co daje **3600 zadań** w całym kursie.
 | 2 | 💪 **Ćwicz** | przypominanie bez obrazka, literowanie, gry na kategorie |
 | 3 | 🧩 **Zdania** | układanie zdań z klocków, uzupełnianie luk, dialog |
 | 4 | 🏆 **Mistrz** | sortowanie, memory, powtórki SRS, działania po angielsku |
+
+Każda lekcja ma **własny dialog** o id `d.<lessonId>` — worlds.ts podpina je automatycznie,
+więc nie da się zapomnieć przypisania. Cztery scenki z pakietu siedzą na swoich piątkach
+w oryginalnym brzmieniu. Warianty brakującej kwestii pochodzą wyłącznie z rozmów
+z tygodni już poznanych: inaczej dziecko w tygodniu 1 odgadywałoby po tym, czego nie zna.
 
 Po każdej rundzie ekran przerwy: zdobyte XP i kryształy, pasek 4 rund, wybór
 „Dalej" albo „Na dziś wystarczy". Nagroda za rundę jest zapisana od razu, więc
@@ -165,7 +170,7 @@ Lekcja dokłada do 4 elementów należnych dziś z wcześniejszych lekcji.
 | **Do którego koszyka?** | element leci pojedynczo, stukasz koszyk-kategorię | sortowanie bez przeciągania |
 | **Złap wszystkie słowa** | bąbelki z kategorią do wyłapania | rozładowanie w środku rundy |
 | **Policz po angielsku** | `eight + two = ?` z angielskimi liczebnikami | Karta pracy 1A, zadanie 3 |
-| **Dialog z luką** | cała rozmowa z pakietu, jedna kwestia wycięta | piątkowa scenka |
+| **Dialog z luką** | cała rozmowa, jedna kwestia wycięta | jeden dialog na każdą lekcję |
 | **Wybierz właściwą formę** | `My sister ___ an apple every day.` → plays / play / playing | odmiana czasownika |
 | **Odmień czasownik** | trzy formy naraz: on/ona · teraz · wczoraj | tabelka odmiany |
 | **Kiedy to się dzieje?** | zdanie → codziennie / teraz / wczoraj | rozpoznawanie czasu |

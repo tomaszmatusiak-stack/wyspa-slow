@@ -118,17 +118,40 @@ export function gapOptions(sentence: Sentence, gapIndex: number): string[] {
   return shuffle([correct, ...sample([...new Set(candidates)], 2)])
 }
 
-/** Warianty brakującej kwestii w dialogu — pozostałe linie tej samej osoby brzmią wiarygodnie. */
-export function dialogOptions(dialog: Dialog, hiddenIndex: number, allDialogs: readonly Dialog[]): string[] {
+/**
+ * Warianty brakującej kwestii w dialogu.
+ *
+ * Jedna wiarygodna kwestia z tego samego dialogu, resztę bierzemy z dialogów
+ * **z tygodni już poznanych** (`scoped`). Inaczej dziecko w tygodniu 1 dostawałoby
+ * jako wariant zdanie z tygodnia 11 i odgadywało po tym, czego jeszcze nie zna.
+ * `all` jest awaryjnym zapasem dla pierwszych lekcji, gdzie dialogów jest za mało.
+ */
+export function dialogOptions(
+  dialog: Dialog,
+  hiddenIndex: number,
+  scoped: readonly Dialog[],
+  all: readonly Dialog[],
+): string[] {
   const correct = dialog.lines[hiddenIndex]
-  const sameSpeaker = dialog.lines.filter((l, i) => i !== hiddenIndex && l.who === correct.who)
-  const foreign = allDialogs
-    .filter((d) => d.id !== dialog.id)
-    .flatMap((d) => d.lines)
-    .filter((l) => l.who === correct.who)
+  const linesOf = (list: readonly Dialog[]) =>
+    list.filter((d) => d.id !== dialog.id).flatMap((d) => d.lines)
 
-  const wrong = [...sample(sameSpeaker, 1), ...sample(foreign, 2)].slice(0, 2)
-  while (wrong.length < 2 && foreign.length) wrong.push(pick(foreign))
+  const wrong: string[] = []
+  const addFrom = (lines: readonly { who: string; en: string }[]) => {
+    for (const line of shuffle(lines)) {
+      if (wrong.length >= 2) return
+      if (line.en !== correct.en && !wrong.includes(line.en)) wrong.push(line.en)
+    }
+  }
 
-  return shuffle([correct.en, ...wrong.map((l) => l.en)])
+  const sameSpeaker = (lines: readonly { who: string; en: string }[]) =>
+    lines.filter((l) => l.who === correct.who)
+
+  // Jeden wariant z tej samej rozmowy — brzmi najbardziej wiarygodnie.
+  addFrom(sameSpeaker(dialog.lines.filter((_, i) => i !== hiddenIndex)).slice(0, 1))
+  addFrom(sameSpeaker(linesOf(scoped)))
+  addFrom(sameSpeaker(linesOf(all)))
+  addFrom(linesOf(all))
+
+  return shuffle([correct.en, ...wrong])
 }

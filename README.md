@@ -8,7 +8,7 @@ Tygodnie 1–4 to pakiet wakacyjny (przedstawianie się, dom i jedzenie, sport, 
 Tygodnie 5–12 prowadzą dalej: szkoła, plan dnia i godziny, ciało i zdrowie, zwierzęta,
 restauracja, przyimki miejsca, wygląd i ubrania, pory roku.
 
-**60 lekcji dziennych · 60 zadań w każdej · 15 typów zadań · 450 słów i zwrotów · 63 czasowniki z pełną odmianą · 108 zdań · 4 dialogi**
+**60 lekcji dziennych · 60 zadań w każdej · 15 typów zadań · 450 słów i zwrotów · 63 czasowniki z pełną odmianą · 108 zdań · 60 dialogów**
 
 ## Jak to działa
 
