@@ -6,6 +6,7 @@ import { PROMPTS } from './common'
 import { TENSE_LABEL } from '../content/verbs'
 import { play } from '../audio/sfx'
 import { SpeakerButton } from '../ui/kit'
+import { Emoji } from '../ui/Emoji'
 
 const BUCKETS: Tense[] = ['present', 'continuous', 'past']
 
@@ -80,7 +81,7 @@ export function TenseSort({ task, say, onAnswer }: ExerciseProps<TenseSortTask>)
               onClick={() => choose(tense)}
               className={`chunky chunky-press flex min-h-24 flex-col items-center justify-center gap-1 rounded-2xl border-2 border-slate-200 px-1 py-3 ${tone}`}
             >
-              <span className="text-3xl">{meta.icon}</span>
+              <Emoji value={meta.icon} size="sm" />
               <span className="text-sm leading-tight font-extrabold">{meta.pl}</span>
             </button>
           )

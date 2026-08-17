@@ -30,6 +30,33 @@ export function starsFor(errors: number, tasks: number): 1 | 2 | 3 {
   return 1
 }
 
+/** Polska skala ocen — dzieci ją znają ze szkoły, więc nie trzeba jej tłumaczyć. */
+export type Grade = 1 | 2 | 3 | 4 | 5 | 6
+
+const GRADE_LABEL: Record<Grade, string> = {
+  6: 'celujący',
+  5: 'bardzo dobry',
+  4: 'dobry',
+  3: 'dostateczny',
+  2: 'dopuszczający',
+  1: 'niedostateczny',
+}
+
+/**
+ * Progi są łagodniejsze niż szkolne: w apce część błędów bierze się z chybionego
+ * stuknięcia, nie z niewiedzy.
+ */
+export function gradeFor(correct: number, total: number): { grade: Grade; label: string; pct: number } {
+  const pct = total > 0 ? correct / total : 0
+  const grade: Grade =
+    pct >= 0.9 ? 6 : pct >= 0.8 ? 5 : pct >= 0.65 ? 4 : pct >= 0.5 ? 3 : pct >= 0.33 ? 2 : 1
+  return { grade, label: GRADE_LABEL[grade], pct: Math.round(pct * 100) }
+}
+
+export function starsForGrade(grade: Grade): 1 | 2 | 3 {
+  return grade >= 5 ? 3 : grade >= 3 ? 2 : 1
+}
+
 export interface Reward {
   xp: number
   crystals: number

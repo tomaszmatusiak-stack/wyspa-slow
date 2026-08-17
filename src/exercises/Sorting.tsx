@@ -5,6 +5,7 @@ import type { ExerciseProps } from './common'
 import { PROMPTS } from './common'
 import { play } from '../audio/sfx'
 import { Asset } from '../ui/kit'
+import { Emoji } from '../ui/Emoji'
 
 /**
  * Sortowanie do koszyków. Elementy lecą pojedynczo, a dziecko stuka koszyk —
@@ -75,7 +76,7 @@ export function Sorting({ task, say, onAnswer }: ExerciseProps<SortingTask>) {
               onClick={() => drop(b.key)}
               className={`chunky chunky-press flex min-h-24 flex-col items-center justify-center gap-1 rounded-2xl border-2 border-slate-200 px-2 py-3 ${tone}`}
             >
-              <span className="text-3xl">{b.icon}</span>
+              <Emoji value={b.icon} size="sm" />
               <span className="text-sm leading-tight font-extrabold">{b.label}</span>
             </button>
           )

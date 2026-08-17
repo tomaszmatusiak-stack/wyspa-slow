@@ -507,11 +507,60 @@ function tensesFor(worldId: number): Tense[] {
   return out
 }
 
-/** Dopycha rundę mieszanymi quizami, żeby nawet lekcja z dwoma zwrotami trwała pełne 11 minut. */
-function padTo(tasks: Task[], target: number, m: Material): Task[] {
+/** Ile zadań ma sprawdzian na koniec dnia. */
+export const TEST_SIZE = 12
+
+/**
+ * Sprawdzian z wiedzy dnia. Reguły są inne niż w rundach i to jest sedno:
+ * bez podpowiedzi po polsku, bez ułatwiania po błędach, bez powrotu błędnego
+ * zadania — każde pytanie raz. Zawsze pyta o produkcję (PL→EN, pisanie,
+ * zdanie bez wzoru), nie o rozpoznawanie.
+ */
+export function buildTest(ctx: BuildContext): Task[] {
+  const m = prepare(ctx)
+  const ids = ctx.lesson.sentences
+  const allowed = tensesFor(ctx.lesson.worldId)
+
+  const words = sample(m.focus, m.focus.length)
+  const spellable = words.filter((w) => w.kind === 'word')
+
+  const plan: (Task | null)[] = [
+    ...words.slice(0, 4).map((w) => quiz(m, w, 'pl2word')),
+    ...sample(spellable, Math.min(2, spellable.length))
+      .map((w) => spelling(m, w))
+      .filter(Boolean),
+    ...sample(ids, Math.min(2, ids.length)).map((id) => {
+      const t = sentence(m, id)
+      // Na sprawdzianie zdanie idzie bez podpowiedzi i z pełnym zestawem pułapek.
+      if (t.kind === 'sentence') {
+        t.showHint = false
+        t.pool = sentencePool(t.sentence, 3)
+      }
+      return t
+    }),
+    ...sample(m.verbs.length ? m.verbs : [], Math.min(2, m.verbs.length)).flatMap((v) =>
+      tensesForVerb(v, allowed).slice(0, 1).map((t) => verbForm(m, v, t)),
+    ),
+    ids.length ? fillGap(m, pick(ids)) : null,
+    ...dialogTasks(m, 1),
+  ]
+
+  const tasks = plan.filter((t): t is Task => t !== null)
+  return padTo(tasks, TEST_SIZE, m, ['pl2word']).slice(0, TEST_SIZE)
+}
+
+/**
+ * Dopycha rundę mieszanymi quizami, żeby nawet lekcja z dwoma zwrotami trwała pełne 11 minut.
+ * Na sprawdzianie dopycha wyłącznie trybem PL→EN: tam nie pytamy o rozpoznawanie.
+ */
+function padTo(
+  tasks: Task[],
+  target: number,
+  m: Material,
+  modes: readonly ('pic2word' | 'word2pic' | 'pl2word')[] = ['pl2word', 'word2pic', 'pic2word'],
+): Task[] {
   if (tasks.length >= target) return tasks
   const candidates = shuffle([...m.focus, ...m.recap, ...m.known.slice(-12)])
-  const modes = ['pl2word', 'word2pic', 'pic2word'] as const
   const out = [...tasks]
   let i = 0
   while (out.length < target && candidates.length) {

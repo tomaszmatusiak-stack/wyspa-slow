@@ -3,6 +3,7 @@ import { motion } from 'motion/react'
 import { useGame } from '../store/useGame'
 import { PrimaryButton, Tile } from '../ui/kit'
 import { levelProgress } from '../engine/scoring'
+import { Emoji } from '../ui/Emoji'
 
 /** Jeden awatar dla wszystkich — wybór postaci tylko opóźniał wejście do gry. */
 export const DEFAULT_AVATAR = '⚽'
@@ -20,9 +21,8 @@ export function ProfileGate() {
           initial={{ scale: 0.6, rotate: -10 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{ type: 'spring', stiffness: 220, damping: 14 }}
-          className="text-7xl"
         >
-          ⚽
+          <Emoji value="⚽" size="xl" />
         </motion.div>
         <h1 className="mt-2 text-4xl font-black text-violet-900">Wyspa Słów</h1>
         <p className="mt-1 font-bold text-ink-soft">Angielski na wakacje</p>
@@ -44,7 +44,7 @@ export function ProfileGate() {
             return (
               <Tile key={p.id} className="justify-between gap-3 px-5" onClick={() => selectProfile(p.id)}>
                 <span className="flex items-center gap-3">
-                  <span className="text-4xl">{p.avatar}</span>
+                  <Emoji value={p.avatar} size="md" />
                   <span className="text-xl">{p.name}</span>
                 </span>
                 <span className="flex items-center gap-3 text-sm font-extrabold text-ink-soft">

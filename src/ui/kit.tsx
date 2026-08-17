@@ -1,6 +1,8 @@
 import { motion } from 'motion/react'
 import type { ReactNode } from 'react'
 import { play } from '../audio/sfx'
+import { Emoji } from './Emoji'
+import type { EmojiSize } from './Emoji'
 
 export type TileState = 'idle' | 'chosen' | 'correct' | 'wrong' | 'muted'
 
@@ -77,14 +79,9 @@ export function PrimaryButton({
   )
 }
 
-/** Emoji-obrazek. Jedyne miejsce, które trzeba tknąć przy migracji na OpenMoji. */
-export function Asset({ value, size = 'lg' }: { value: string; size?: 'sm' | 'md' | 'lg' | 'xl' }) {
-  const sizes = { sm: 'text-3xl', md: 'text-5xl', lg: 'text-7xl', xl: 'text-8xl' }
-  return (
-    <span className={`${sizes[size]} leading-none select-none`} role="img" aria-hidden>
-      {value}
-    </span>
-  )
+/** Obrazek słowa. Grafika idzie z OpenMoji — patrz ui/Emoji.tsx. */
+export function Asset({ value, size = 'lg' }: { value: string; size?: EmojiSize }) {
+  return <Emoji value={value} size={size} />
 }
 
 export function SpeakerButton({ onClick, big = false }: { onClick: () => void; big?: boolean }) {
@@ -118,9 +115,9 @@ export function Bar({ value, max, className = 'bg-emerald-400' }: { value: numbe
 }
 
 export function Stars({ count, size = 'md' }: { count: number; size?: 'sm' | 'md' | 'lg' }) {
-  const sizes = { sm: 'text-base', md: 'text-2xl', lg: 'text-5xl' }
+  const px: Record<string, EmojiSize> = { sm: 'xs', md: 'sm', lg: 'lg' }
   return (
-    <div className={`flex gap-1 ${sizes[size]}`}>
+    <div className="flex gap-1">
       {[1, 2, 3].map((i) => (
         <motion.span
           key={i}
@@ -129,7 +126,7 @@ export function Stars({ count, size = 'md' }: { count: number; size?: 'sm' | 'md
           transition={{ delay: size === 'lg' ? 0.15 * i : 0, type: 'spring', stiffness: 260, damping: 14 }}
           className={i <= count ? '' : 'opacity-25 grayscale'}
         >
-          ⭐
+          <Emoji value="⭐" size={px[size]} />
         </motion.span>
       ))}
     </div>

@@ -3,16 +3,18 @@ import { motion } from 'motion/react'
 import type { Task } from '../types'
 import { ROUNDS, ROUND_COUNT } from '../types'
 import { LESSON_BY_ID } from '../content/worlds'
-import { buildRound } from '../engine/lessonBuilder'
+import { TEST_SIZE, buildRound, buildTest } from '../engine/lessonBuilder'
 import { SessionMood } from '../engine/difficulty'
 import { RETRY_SUFFIX, retryTask } from '../engine/retry'
 import { progressMapFor, roundsDone, useGame } from '../store/useGame'
 import { play } from '../audio/sfx'
 import { stopSpeaking } from '../audio/tts'
 import { Bar, PrimaryButton } from '../ui/kit'
+import type { Grade } from '../engine/scoring'
 import { Exercise } from '../exercises'
 import { RoundBreak } from './RoundBreak'
 import { useSay } from './useSay'
+import { Emoji } from '../ui/Emoji'
 
 /** Runda ma trwać ~11 minut; po piętnastu ucinamy ją i proponujemy przerwę. */
 const ROUND_TIME_LIMIT_MS = 15 * 60 * 1000
@@ -25,10 +27,17 @@ export interface LessonResult {
   xp: number
   crystals: number
   stars: 1 | 2 | 3
+  grade: Grade
+  gradeLabel: string
   levelUp: boolean
   errors: number
   tasks: number
+  testCorrect: number
+  testTotal: number
 }
+
+/** Faza „sprawdzian" siedzi na indeksie zaraz za ostatnią rundą. */
+const TEST_PHASE = ROUND_COUNT
 
 export function LessonScreen({
   lessonId,
@@ -52,7 +61,8 @@ export function LessonScreen({
   // Wznawiamy od rundy, na której dziecko skończyło poprzednio.
   const [round, setRound] = useState(() => {
     const s = useGame.getState()
-    return Math.min(ROUND_COUNT - 1, roundsDone(s.rounds, s.activeProfileId!, lessonId))
+    // roundsDone === ROUND_COUNT znaczy: rundy zrobione, został sprawdzian.
+    return Math.min(TEST_PHASE, roundsDone(s.rounds, s.activeProfileId!, lessonId))
   })
 
   const [queue, setQueue] = useState<Task[]>(() => makeRound(round))
@@ -78,14 +88,16 @@ export function LessonScreen({
 
   function makeRound(r: number): Task[] {
     const s = useGame.getState()
-    return buildRound(r, {
+    const ctx = {
       lesson,
       progress: progressMapFor(s, s.activeProfileId!),
       maxTier,
       now: Date.now(),
-    })
+    }
+    return r >= TEST_PHASE ? buildTest(ctx) : buildRound(r, ctx)
   }
 
+  const isTest = round >= TEST_PHASE
   const task = queue[index]
 
   function endRound(ranOut: boolean) {
@@ -93,6 +105,30 @@ export function LessonScreen({
     closingRound.current = true
 
     const seconds = Math.round((Date.now() - roundStartedAt.current) / 1000)
+
+    if (isTest) {
+      // Sprawdzian domyka dzień: jego wynik decyduje o ocenie i gwiazdkach.
+      const testTotal = roundTasks.current
+      const testCorrect = testTotal - roundErrors.current
+      const final = finishLesson({
+        lessonId,
+        tasks: totalTasks.current + testTotal,
+        errors: totalErrors.current + roundErrors.current,
+        testCorrect,
+        testTotal,
+      })
+      play(final.levelUp ? 'levelUp' : 'finish')
+      onDone({
+        lessonId,
+        ...final,
+        errors: totalErrors.current + roundErrors.current,
+        tasks: totalTasks.current + testTotal,
+        testCorrect,
+        testTotal,
+      })
+      return
+    }
+
     const reward = finishRound({
       lessonId,
       round,
@@ -102,24 +138,6 @@ export function LessonScreen({
     })
     totalTasks.current += roundTasks.current
     totalErrors.current += roundErrors.current
-
-    if (round + 1 >= ROUND_COUNT) {
-      const final = finishLesson({
-        lessonId,
-        tasks: totalTasks.current,
-        errors: totalErrors.current,
-      })
-      play(final.levelUp ? 'levelUp' : 'finish')
-      onDone({
-        lessonId,
-        ...final,
-        xp: final.xp + reward.xp,
-        crystals: final.crystals + reward.crystals,
-        errors: totalErrors.current,
-        tasks: totalTasks.current,
-      })
-      return
-    }
 
     play(reward.levelUp ? 'levelUp' : 'star')
     setFeedback(null)
@@ -162,6 +180,7 @@ export function LessonScreen({
       // a nie dopiero za trzy dni w powtórkach. Powtórka nie dokleja kolejnej powtórki.
       const isRetry = task.key.endsWith(RETRY_SUFFIX)
       if (
+        !isTest &&
         !isRetry &&
         !retried.current.has(task.key) &&
         task.kind !== 'memory' &&
@@ -193,6 +212,8 @@ export function LessonScreen({
         xp={breakInfo.xp}
         crystals={breakInfo.crystals}
         ranOutOfTime={breakInfo.ranOut}
+        nextIsTest={round + 1 >= TEST_PHASE}
+        testSize={TEST_SIZE}
         onContinue={startNextRound}
         onStop={onExit}
       />
@@ -201,7 +222,7 @@ export function LessonScreen({
 
   if (!task) return null
 
-  const meta = ROUNDS[round]
+  const meta = ROUNDS[Math.min(round, ROUND_COUNT - 1)]
 
   return (
     <div className="mx-auto flex min-h-full max-w-md flex-col">
@@ -225,12 +246,20 @@ export function LessonScreen({
             {index + 1}/{queue.length}
           </span>
         </div>
-        <p className="mt-1.5 text-center text-xs font-black tracking-wide text-ink-soft uppercase">
-          {meta.icon} Runda {round + 1} z {ROUND_COUNT} · {meta.title}
+        <p className="mt-1.5 flex items-center justify-center gap-1.5 text-center text-xs font-black tracking-wide uppercase">
+          {isTest ? (
+            <span className="flex items-center gap-1.5 text-rose-600">
+              <Emoji value="📋" size="xs" /> Sprawdzian · bez podpowiedzi
+            </span>
+          ) : (
+            <span className="flex items-center gap-1.5 text-ink-soft">
+              <Emoji value={meta.icon} size="xs" /> Runda {round + 1} z {ROUND_COUNT} · {meta.title}
+            </span>
+          )}
         </p>
       </header>
 
-      {mood.easing && (
+      {mood.easing && !isTest && (
         <p className="px-4 pt-1 text-center text-xs font-extrabold text-amber-700">
           Robimy trochę łatwiej 💛
         </p>

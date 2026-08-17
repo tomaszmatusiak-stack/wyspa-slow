@@ -2,6 +2,7 @@ import { motion } from 'motion/react'
 import type { Lesson } from '../types'
 import { ROUNDS, ROUND_COUNT } from '../types'
 import { Burst, PrimaryButton } from '../ui/kit'
+import { Emoji } from '../ui/Emoji'
 
 /**
  * Przerwa między rundami. Dzienna lekcja trwa ~45 minut, więc dziecko dostaje
@@ -13,6 +14,8 @@ export function RoundBreak({
   xp,
   crystals,
   ranOutOfTime,
+  nextIsTest,
+  testSize,
   onContinue,
   onStop,
 }: {
@@ -21,6 +24,8 @@ export function RoundBreak({
   xp: number
   crystals: number
   ranOutOfTime: boolean
+  nextIsTest: boolean
+  testSize: number
   onContinue: () => void
   onStop: () => void
 }) {
@@ -34,9 +39,8 @@ export function RoundBreak({
         initial={{ scale: 0.4, rotate: -12 }}
         animate={{ scale: 1, rotate: 0 }}
         transition={{ type: 'spring', stiffness: 220, damping: 13 }}
-        className="text-7xl"
       >
-        {ROUNDS[finishedRound].icon}
+        <Emoji value={ROUNDS[finishedRound].icon} size="xl" />
       </motion.div>
 
       <div>
@@ -55,7 +59,7 @@ export function RoundBreak({
               i <= finishedRound ? 'bg-emerald-400 text-white' : 'bg-white/70 opacity-50'
             }`}
           >
-            {i <= finishedRound ? '✓' : r.icon}
+            {i <= finishedRound ? '✓' : <Emoji value={r.icon} size="sm" />}
           </div>
         ))}
       </div>
@@ -65,6 +69,13 @@ export function RoundBreak({
         <Box label="Kryształy" value={`+${crystals}`} />
       </div>
 
+      {nextIsTest && (
+        <div className="rounded-2xl bg-rose-100 px-4 py-3 text-sm font-bold text-rose-900">
+          Teraz <strong>sprawdzian</strong>: {testSize} zadań, <strong>bez podpowiedzi</strong>,
+          każde pytanie tylko raz. Z niego wychodzi ocena i gwiazdki za dzień.
+        </div>
+      )}
+
       {ranOutOfTime && (
         <p className="rounded-2xl bg-amber-200 px-4 py-2 text-sm font-bold">
           Ta runda trwała długo — dobry moment na przerwę.
@@ -72,19 +83,27 @@ export function RoundBreak({
       )}
 
       <div className="flex w-full flex-col gap-3">
-        <PrimaryButton onClick={onContinue}>
-          Dalej: {nextMeta.icon} {nextMeta.title}
-          <span className="ml-2 text-sm font-bold opacity-80">
-            ({finishedRound + 2}/{ROUND_COUNT})
-          </span>
-        </PrimaryButton>
+        {nextIsTest ? (
+          <PrimaryButton onClick={onContinue}>
+            <Emoji value="📋" size="xs" /> Zaczynam sprawdzian
+          </PrimaryButton>
+        ) : (
+          <PrimaryButton onClick={onContinue}>
+            Dalej: <Emoji value={nextMeta.icon} size="xs" /> {nextMeta.title}
+            <span className="ml-2 text-sm font-bold opacity-80">
+              ({finishedRound + 2}/{ROUND_COUNT})
+            </span>
+          </PrimaryButton>
+        )}
         <PrimaryButton tone="slate" onClick={onStop}>
           Na dziś wystarczy
         </PrimaryButton>
       </div>
 
       <p className="text-xs font-bold text-ink-soft">
-        Postęp jest zapisany — jutro zaczniesz od rundy {finishedRound + 2}.
+        {nextIsTest
+          ? 'Postęp jest zapisany — sprawdzian możesz zrobić też później.'
+          : `Postęp jest zapisany — jutro zaczniesz od rundy ${finishedRound + 2}.`}
       </p>
     </div>
   )

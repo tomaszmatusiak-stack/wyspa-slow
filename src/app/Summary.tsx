@@ -3,6 +3,7 @@ import type { LessonResult } from './LessonScreen'
 import { LESSON_BY_ID, LESSON_ORDER } from '../content/worlds'
 import { isLessonUnlocked, useActiveProfile, useGame } from '../store/useGame'
 import { Burst, PrimaryButton, Stars } from '../ui/kit'
+import { Emoji } from '../ui/Emoji'
 
 export function Summary({
   result,
@@ -30,9 +31,8 @@ export function Summary({
         initial={{ scale: 0.4, rotate: -12 }}
         animate={{ scale: 1, rotate: 0 }}
         transition={{ type: 'spring', stiffness: 220, damping: 13 }}
-        className="text-7xl"
       >
-        {lesson.icon}
+        <Emoji value={lesson.icon} size="xl" />
       </motion.div>
 
       <div>
@@ -44,14 +44,35 @@ export function Summary({
 
       <Stars count={result.stars} size="lg" />
 
-      <div className="grid w-full grid-cols-3 gap-3">
+      {/* Ocena ze sprawdzianu — to ona decyduje o gwiazdkach za dzień. */}
+      <motion.div
+        initial={{ scale: 0.6, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.5, type: 'spring', stiffness: 240, damping: 15 }}
+        className={`flex w-full items-center justify-center gap-4 rounded-3xl px-5 py-4 ${GRADE_TONE[result.grade]}`}
+      >
+        <span className="text-6xl font-black">{result.grade}</span>
+        <span className="text-left">
+          <span className="block text-sm font-black tracking-wide uppercase opacity-70">
+            Sprawdzian
+          </span>
+          <span className="block text-xl font-black">{result.gradeLabel}</span>
+          <span className="block text-sm font-bold opacity-80">
+            {result.testCorrect} / {result.testTotal} poprawnie
+          </span>
+        </span>
+      </motion.div>
+
+      <div className="grid w-full grid-cols-2 gap-3">
         <Box label="XP" value={`+${result.xp}`} />
         <Box label="Kryształy" value={`+${result.crystals}`} />
-        <Box
-          label="Trafione"
-          value={`${Math.round((1 - result.errors / Math.max(1, result.tasks)) * 100)}%`}
-        />
       </div>
+
+      {result.grade <= 2 && (
+        <p className="rounded-2xl bg-amber-100 px-4 py-2 text-sm font-bold">
+          Ten dzień warto powtórzyć — wróć tu jutro i sprawdzian pójdzie lepiej.
+        </p>
+      )}
 
       {result.levelUp && (
         <motion.p
@@ -75,6 +96,16 @@ export function Summary({
       </div>
     </div>
   )
+}
+
+/** Kolor oceny: bez czerwieni dla 3 — dostateczny to nadal zaliczone. */
+const GRADE_TONE: Record<number, string> = {
+  6: 'bg-emerald-400 text-white',
+  5: 'bg-emerald-300 text-emerald-950',
+  4: 'bg-lime-200 text-lime-950',
+  3: 'bg-amber-200 text-amber-950',
+  2: 'bg-orange-200 text-orange-950',
+  1: 'bg-rose-200 text-rose-950',
 }
 
 function Box({ label, value }: { label: string; value: string }) {

@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import type { ItemProgress, Profile, ProfileSettings, Tier } from '../types'
 import { applyAnswer, blankProgress } from '../engine/srs'
-import { lessonReward, roundReward } from '../engine/scoring'
+import { gradeFor, lessonReward, roundReward, starsForGrade } from '../engine/scoring'
+import type { Grade } from '../engine/scoring'
 import { LESSON_ORDER } from '../content/worlds'
 import { debounced, kvGet, kvSet } from './persist'
 import { setSfxEnabled } from '../audio/sfx'
@@ -98,10 +99,18 @@ interface GameState extends SaveData {
     errors: number
     seconds: number
   }) => { xp: number; crystals: number; levelUp: boolean }
-  finishLesson: (args: { lessonId: string; tasks: number; errors: number }) => {
+  finishLesson: (args: {
+    lessonId: string
+    tasks: number
+    errors: number
+    testCorrect: number
+    testTotal: number
+  }) => {
     xp: number
     crystals: number
     stars: 1 | 2 | 3
+    grade: Grade
+    gradeLabel: string
     levelUp: boolean
     firstClear: boolean
   }
@@ -239,15 +248,24 @@ export const useGame = create<GameState>((set, get) => ({
     return { ...reward, levelUp: levelOf(xpBefore + reward.xp) > levelOf(xpBefore) }
   },
 
-  finishLesson: ({ lessonId, tasks, errors }) => {
+  finishLesson: ({ lessonId, tasks, errors, testCorrect, testTotal }) => {
     const s = get()
     const pid = s.activeProfileId
-    if (!pid) return { xp: 0, crystals: 0, stars: 1 as const, levelUp: false, firstClear: false }
+    if (!pid) {
+      return {
+        xp: 0, crystals: 0, stars: 1 as const, grade: 1 as Grade,
+        gradeLabel: '', levelUp: false, firstClear: false,
+      }
+    }
 
     const starKey = `${pid}|${lessonId}`
     const previousStars = s.stars[starKey]
     const firstClear = previousStars === undefined
-    const reward = lessonReward(tasks, errors, firstClear)
+    const base = lessonReward(tasks, errors, firstClear)
+    // Gwiazdki bierzemy ze sprawdzianu, nie ze skuteczności w rundach:
+    // rundy są nauką z podpowiedziami, sprawdzian sprawdza, co zostało w głowie.
+    const { grade, label } = gradeFor(testCorrect, testTotal)
+    const reward = { ...base, stars: starsForGrade(grade) }
 
     const today = dayKey()
     const profile = s.profiles.find((p) => p.id === pid)!
@@ -279,7 +297,13 @@ export const useGame = create<GameState>((set, get) => ({
     set(next)
     save(snapshot(next))
 
-    return { ...reward, firstClear, levelUp: levelOf(xpBefore + reward.xp) > levelOf(xpBefore) }
+    return {
+      ...reward,
+      grade,
+      gradeLabel: label,
+      firstClear,
+      levelUp: levelOf(xpBefore + reward.xp) > levelOf(xpBefore),
+    }
   },
 }))
 

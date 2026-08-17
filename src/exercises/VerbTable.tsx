@@ -6,6 +6,7 @@ import { PROMPTS } from './common'
 import { TENSE_LABEL } from '../content/verbs'
 import { play } from '../audio/sfx'
 import { Asset, SpeakerButton } from '../ui/kit'
+import { Emoji } from '../ui/Emoji'
 
 const SLOTS: { tense: Tense; label: string; example: string }[] = [
   { tense: 'present', label: 'on / ona', example: 'He ___' },
@@ -77,8 +78,8 @@ export function VerbTable({ task, say, onAnswer }: ExerciseProps<VerbTableTask>)
                     : 'border-slate-200 bg-white/70'
               }`}
             >
-              <span className="w-24 shrink-0 text-sm font-black text-ink-soft">
-                {TENSE_LABEL[slot.tense].icon} {slot.label}
+              <span className="flex w-24 shrink-0 items-center gap-1 text-sm font-black text-ink-soft">
+                <Emoji value={TENSE_LABEL[slot.tense].icon} size="xs" /> {slot.label}
               </span>
               <span className="flex-1 text-lg font-extrabold">
                 {slot.example.replace('___', '')}

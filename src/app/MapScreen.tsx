@@ -6,6 +6,7 @@ import { dayKey, isLessonUnlocked, roundsDone, useActiveProfile, useGame } from 
 import { levelProgress } from '../engine/scoring'
 import { Bar, Chip, Stars } from '../ui/kit'
 import { Settings } from './Settings'
+import { Emoji } from '../ui/Emoji'
 
 const HUE: Record<string, { band: string; node: string; shadow: string; text: string }> = {
   amber: { band: 'from-amber-200 to-amber-100', node: 'bg-amber-400', shadow: '[--chunky-shadow:var(--color-amber-600)]', text: 'text-amber-900' },
@@ -41,10 +42,10 @@ export function MapScreen({ onStart }: { onStart: (lessonId: string) => void }) 
           <button
             type="button"
             onClick={() => setSettingsOpen(true)}
-            className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white text-3xl shadow"
+            className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white shadow"
             aria-label="Ustawienia"
           >
-            {profile.avatar}
+            <Emoji value={profile.avatar} size="sm" />
           </button>
           <div className="min-w-0 flex-1">
             <div className="flex items-baseline justify-between gap-2">
@@ -56,8 +57,12 @@ export function MapScreen({ onStart }: { onStart: (lessonId: string) => void }) 
             </div>
           </div>
           <div className="flex shrink-0 flex-col items-end gap-1 text-sm font-black">
-            <span>💎 {profile.crystals}</span>
-            <span>🔥 {profile.streak}</span>
+            <span className="flex items-center gap-1">
+              <Emoji value="💎" size="xs" /> {profile.crystals}
+            </span>
+            <span className="flex items-center gap-1">
+              <Emoji value="🔥" size="xs" /> {profile.streak}
+            </span>
           </div>
         </div>
 
@@ -77,7 +82,7 @@ export function MapScreen({ onStart }: { onStart: (lessonId: string) => void }) 
             <section key={world.id}>
               <div className={`rounded-3xl bg-gradient-to-b ${hue.band} px-4 py-3`}>
                 <div className="flex items-center gap-3">
-                  <span className="text-4xl">{world.icon}</span>
+                  <Emoji value={world.icon} size="md" />
                   <div>
                     <p className={`text-xs font-black tracking-wide uppercase ${hue.text} opacity-70`}>
                       {world.subtitle}
@@ -108,8 +113,8 @@ export function MapScreen({ onStart }: { onStart: (lessonId: string) => void }) 
                             : 'bg-slate-200 text-slate-400 [--chunky-shadow:var(--color-slate-300)]'
                         }`}
                       >
-                        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white/30 text-2xl">
-                          {unlocked ? lesson.icon : '🔒'}
+                        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white/30">
+                          <Emoji value={unlocked ? lesson.icon : '🔒'} size="sm" />
                         </span>
                         <span className="min-w-0 flex-1">
                           <span className="flex items-baseline gap-2">

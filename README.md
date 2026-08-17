@@ -8,7 +8,7 @@ Tygodnie 1–4 to pakiet wakacyjny (przedstawianie się, dom i jedzenie, sport, 
 Tygodnie 5–12 prowadzą dalej: szkoła, plan dnia i godziny, ciało i zdrowie, zwierzęta,
 restauracja, przyimki miejsca, wygląd i ubrania, pory roku.
 
-**60 lekcji dziennych · 60 zadań w każdej · 16 typów zadań · 450 słów i zwrotów · 63 czasowniki z pełną odmianą · 108 zdań · 60 dialogów**
+**60 lekcji dziennych · 60 zadań w każdej · 16 typów zadań · sprawdzian na koniec dnia · 450 słów i zwrotów · 63 czasowniki z pełną odmianą · 108 zdań · 60 dialogów**
 
 ## Jak to działa
 
@@ -23,6 +23,10 @@ Jedna lekcja to jeden dzień planu, ~45 minut podzielone na cztery rundy:
 
 Po każdej rundzie jest przerwa z nagrodą. Postęp zapisuje się od razu, więc lekcję
 można przerwać w połowie i wrócić następnego dnia.
+
+Na koniec dnia jest **sprawdzian**: 12 zadań, bez podpowiedzi, bez ułatwiania po błędach,
+każde pytanie raz i tylko o produkcję (PL→EN, pisanie, zdanie bez wzoru). Z niego wychodzi
+ocena w polskiej skali 1–6 i gwiazdki za dzień. Można go powtarzać — liczy się najlepszy wynik.
 
 Typy zadań: posłuchaj i wskaż · quiz obrazkowy · memory · połącz w pary · puzzle zdaniowe ·
 uzupełnij zdanie · literowanie · co tu nie pasuje · sortowanie do koszyków · złap słowa ·
@@ -67,4 +71,13 @@ npm run dev
 ```
 
 Stack: Vite · React 19 · TypeScript · Tailwind CSS v4 · Motion · Zustand.
+Grafika: [OpenMoji](https://openmoji.org) (CC BY-SA 4.0) — 358 ikon w `public/openmoji/`,
+generowane skryptem `scripts/build-openmoji.mjs`.
 Szczegóły projektowe i uzasadnienia decyzji: [DESIGN.md](DESIGN.md).
+
+## Licencje
+
+- Kod: projekt osobisty, bez licencji open source.
+- Grafika: [OpenMoji](https://openmoji.org) — © OpenMoji, licencja
+  [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Pliki SVG w `public/openmoji/`
+  są niezmodyfikowanym podzbiorem oryginalnej paczki.

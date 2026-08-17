@@ -4,6 +4,7 @@ import type { ExerciseProps } from './common'
 import { PROMPTS } from './common'
 import { TENSE_LABEL } from '../content/verbs'
 import { Asset, SpeakerButton, Tile } from '../ui/kit'
+import { Emoji } from '../ui/Emoji'
 
 /** „He ___ football every day." — wybierz właściwą formę czasownika. */
 export function VerbForm({ task, say, onAnswer }: ExerciseProps<VerbFormTask>) {
@@ -23,7 +24,7 @@ export function VerbForm({ task, say, onAnswer }: ExerciseProps<VerbFormTask>) {
       <p className="text-lg font-bold text-ink-soft">{PROMPTS.verbForm}</p>
 
       <div className="flex items-center gap-2 rounded-full bg-white/80 px-4 py-1.5">
-        <span className="text-xl">{tense.icon}</span>
+        <Emoji value={tense.icon} size="xs" />
         <span className="font-black">{tense.pl}</span>
         <span className="text-xs font-bold text-ink-soft">· {tense.hint}</span>
       </div>

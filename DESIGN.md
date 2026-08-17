@@ -1,6 +1,6 @@
 # Wyspa Słów — angielski dla dzieci przez grywalizację
 
-Dokument projektowy · wersja 4.0 (12 tygodni, odmiany czasowników, trzy czasy)
+Dokument projektowy · wersja 5.0 (sprawdzian na koniec dnia, grafika OpenMoji)
 Stan: **Etap 1 zbudowany i zweryfikowany w przeglądarce.**
 
 ---
@@ -52,7 +52,7 @@ Gdyby monetyzować: wersja PRO z dodatkowymi krainami (Lemon Squeezy) > reklamy.
 ## 3. Struktura nauki
 
 ```
-Mapa → Kraina (= tydzień planu) → Lekcja (= jeden dzień) → Runda (4 na lekcję) → Zadanie
+Mapa → Kraina (= tydzień planu) → Lekcja (= jeden dzień) → 4 rundy + sprawdzian → Zadanie
 ```
 
 ### 3.1 Krainy = tygodnie, lekcje = dni
@@ -86,7 +86,8 @@ co daje **3600 zadań** w całym kursie.
 | 1 | 👀 **Poznaj** | pierwszy kontakt: słuchanie, rozpoznawanie obrazków, łączenie w pary |
 | 2 | 💪 **Ćwicz** | przypominanie bez obrazka, literowanie, gry na kategorie |
 | 3 | 🧩 **Zdania** | układanie zdań z klocków, uzupełnianie luk, dialog |
-| 4 | 🏆 **Mistrz** | sortowanie, memory, powtórki SRS, działania po angielsku |
+| 4 | 🏆 **Mistrz** | sortowanie, memory, powtórki SRS, działania po angielsku, układanie dialogu |
+| — | 📋 **Sprawdzian** | 12 zadań na koniec dnia — patrz §3.1c |
 
 Każdy dialog pracuje dwa razy: w rundzie „Zdania" jako **uzupełnianie brakującej kwestii**,
 a na finał rundy „Mistrz" jako **układanie całej rozmowy po kolei**. Drugie ćwiczenie nie kosztowało
@@ -101,6 +102,42 @@ Po każdej rundzie ekran przerwy: zdobyte XP i kryształy, pasek 4 rund, wybór
 „Dalej" albo „Na dziś wystarczy". Nagroda za rundę jest zapisana od razu, więc
 przerwanie lekcji w połowie nie kasuje pracy — następnym razem apka wznawia od kolejnej rundy.
 Gwiazdki przyznajemy dopiero za komplet czterech rund.
+
+### 3.1c Sprawdzian na koniec dnia
+
+Po czterech rundach przychodzi **sprawdzian z wiedzy dnia** — i to jego wynik daje ocenę
+oraz gwiazdki. Rundy są nauką z podpowiedziami; sprawdzian sprawdza, co z tego zostało w głowie.
+
+Reguły są celowo inne niż w rundach:
+
+| | Rundy | Sprawdzian |
+|---|---|---|
+| Podpowiedź po polsku w zdaniach | tak (T1) | **nie** |
+| Ułatwianie po 3 błędach | tak | **nie** |
+| Błędne zadanie wraca w kolejce | tak | **nie — każde pytanie raz** |
+| Typ pytania | rozpoznawanie i produkcja | **tylko produkcja** (PL→EN, pisanie, zdanie bez wzoru) |
+| Długość | 15 zadań | 12 zadań |
+
+Skład: 4 × PL→EN · 2 × literowanie · 2 × zdanie z pełnym zestawem pułapek ·
+2 × forma czasownika · 1 × luka w zdaniu · 1 × brakująca kwestia dialogu.
+
+**Ocena w polskiej skali** — dzieci znają ją ze szkoły, więc nie trzeba jej tłumaczyć.
+Progi są łagodniejsze niż szkolne, bo w apce część błędów bierze się z chybionego stuknięcia:
+
+| Wynik | Ocena | Gwiazdki |
+|---|---|---|
+| 11–12 / 12 | **6** celujący | ⭐⭐⭐ |
+| 10 / 12 | **5** bardzo dobry | ⭐⭐⭐ |
+| 8–9 / 12 | **4** dobry | ⭐⭐ |
+| 6–7 / 12 | **3** dostateczny | ⭐⭐ |
+| 4–5 / 12 | **2** dopuszczający | ⭐ |
+| ≤ 3 / 12 | **1** niedostateczny | ⭐ |
+
+Przy ocenie 1 lub 2 nie ma morałów, tylko „ten dzień warto powtórzyć — wróć tu jutro".
+Sprawdzian można powtarzać, a gwiazdki biorą najlepszy wynik.
+
+Wyjście przed sprawdzianem zapisuje stan: ponowne wejście w lekcję startuje **wprost od sprawdzianu**,
+bez przeklikiwania rund od nowa.
 
 ### 3.2 Trzy stopnie trudności wewnątrz zadania
 
@@ -251,7 +288,7 @@ odznaki · lokalne porównanie postępu tygodniowego między profilami.
 | Dane | własny wrapper IndexedDB (~60 linii, zero zależności) |
 | Lektor | Web Speech API — wybór głosu i tempa w ustawieniach |
 | Efekty | syntezowane w WebAudio — zero plików, zero licencji |
-| Grafika | emoji; migracja na OpenMoji SVG bez ruszania logiki |
+| Grafika | **OpenMoji SVG** (CC BY-SA 4.0), 358 plików w `public/openmoji/` |
 
 **Zasada architektury:** `src/engine/` nie importuje Reacta.
 SRS, składanie lekcji, dobór dystraktorów i punktacja są testowalne bez klikania.
@@ -279,6 +316,29 @@ dzięki temu runda 4 widzi już postępy z rundy 1 i dobiera trudność na bież
 żadnej lekcji, słowa wprowadzone dwa razy, lekcje bez zdań, odmiany wskazujące na nieznane słowo
 i — najważniejsze — **zdania używające materiału z późniejszego tygodnia**. Przy 450 słowach
 ręczne pilnowanie kolejności wprowadzania przestaje działać.
+
+### Grafika: OpenMoji
+
+Cała grafika treściowa (obrazki słów, ikony lekcji, krain, rund, kategorii, czasów, gwiazdki,
+awatary) renderuje się z **OpenMoji** — licencja CC BY-SA 4.0.
+
+Dlaczego nie systemowe emoji: wyglądały inaczej na macOS, Androidzie i Windowsie, a dzieci mają
+korzystać z apki na różnych urządzeniach. Przy okazji znika problem licencyjny.
+
+Jak to działa:
+- `scripts/build-openmoji.mjs` skanuje `src/`, wyciąga wszystkie emoji, dopasowuje je do plików
+  z paczki OpenMoji i kopiuje **tylko potrzebne** (358 z 4284) do `public/openmoji/`.
+  Generuje przy tym `src/content/openmoji.ts` — mapę „emoji → nazwa pliku".
+- `ui/Emoji.tsx` dzieli asset na grafemy: co jest w mapie, renderuje jako `<img>`;
+  co nie jest (`Mon`, `III`, `11`), zostaje tekstem. Dzięki temu tekstowe assety dni tygodnia
+  i miesięcy działają bez wyjątków w treści.
+- Runtime nie zgaduje nazw plików z codepointów — decyzja padła raz, przy generowaniu mapy.
+
+Odświeżenie po dopisaniu nowych emoji do treści:
+
+```bash
+node wyspa_slow/scripts/build-openmoji.mjs <rozpakowana-paczka-openmoji>
+```
 
 ### Dostępność
 Przyciski min. 48 px · opcja czcionki dla dyslektyków · kolor nigdy nie jest jedynym nośnikiem
@@ -348,7 +408,7 @@ etapu 2 bardziej niż jakikolwiek plan.
 | Ryzyko | Reakcja |
 |---|---|
 | Największą robotą jest content, nie kod | 450 słów i 63 odmiany gotowe; kolejne partie jako TS z walidatorem |
-| Emoji nie wystarczą dla ~200 pozycji (czasowniki, przymiotniki, przyimki) | część rozwiązana kombinacjami dwóch emoji; docelowo OpenMoji — patrz ROZSZERZENIE.md §6 |
+| Systemowe emoji wyglądają inaczej na każdym urządzeniu | **zrobione**: cała grafika treściowa idzie z OpenMoji, ten sam obrazek na macOS, Androidzie i Windowsie |
 | Głosy Web Speech API różnią się między systemami | wybór głosu i tempa w ustawieniach profilu |
 | Emoji nie pokażą wszystkiego (`under the table`) | frazy pytamy przez polski, nie przez obrazek; docelowo OpenMoji |
 | Dziecko klika na oślep dla kryształów | pełne XP tylko za pierwsze przejście; gwiazdki zależą od skuteczności |
