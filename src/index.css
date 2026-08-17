@@ -1,0 +1,62 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Nunito', ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --color-ink: #26234d;
+  --color-ink-soft: #5d5988;
+}
+
+:root {
+  color-scheme: light;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: #eef2ff;
+  overscroll-behavior: none;
+}
+
+/* Dziecko klika szybko i dużo — nic nie może się zaznaczać ani przewijać poziomo. */
+button,
+[role='button'] {
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.dyslexia body,
+body.dyslexia {
+  font-family: 'Atkinson Hyperlegible', 'Comic Sans MS', ui-rounded, system-ui, sans-serif;
+  letter-spacing: 0.02em;
+}
+
+/* Klocek 3D — cień pod spodem znika przy wciśnięciu. */
+@utility chunky {
+  box-shadow: 0 5px 0 0 var(--chunky-shadow, rgb(0 0 0 / 0.18));
+  transition:
+    transform 90ms ease,
+    box-shadow 90ms ease;
+}
+@utility chunky-press {
+  &:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 0 var(--chunky-shadow, rgb(0 0 0 / 0.18));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
