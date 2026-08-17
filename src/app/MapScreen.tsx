@@ -26,6 +26,7 @@ export function MapScreen({ onStart }: { onStart: (lessonId: string) => void }) 
   const stars = useGame((s) => s.stars)
   const rounds = useGame((s) => s.rounds)
   const history = useGame((s) => s.history)
+  const profileCount = useGame((s) => s.profiles.length)
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   if (!profile) return null
@@ -39,13 +40,20 @@ export function MapScreen({ onStart }: { onStart: (lessonId: string) => void }) 
       {/* Pasek gracza */}
       <header className="sticky top-0 z-20 bg-indigo-50/95 px-4 pt-4 pb-3 backdrop-blur">
         <div className="flex items-center gap-3">
+          {/* Awatar jest przełącznikiem gracza, nie kołem zębatym — przy dwóch dzieciach
+              na jednym tablecie to najczęściej używany przycisk w całej apce. */}
           <button
             type="button"
             onClick={() => setSettingsOpen(true)}
-            className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white shadow"
-            aria-label="Ustawienia"
+            className="relative grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white shadow"
+            aria-label={`Gracz: ${profile.name}. Zmień gracza lub ustawienia`}
           >
             <Emoji value={profile.avatar} size="sm" />
+            {profileCount > 1 && (
+              <span className="absolute -right-1 -bottom-1 grid h-5 w-5 place-items-center rounded-full bg-violet-600 text-[11px] font-black text-white shadow">
+                ⇄
+              </span>
+            )}
           </button>
           <div className="min-w-0 flex-1">
             <div className="flex items-baseline justify-between gap-2">

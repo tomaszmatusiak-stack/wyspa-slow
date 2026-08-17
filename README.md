@@ -61,6 +61,15 @@ Osobno od wieku ustawia się **poziom wyzwania** (Spokojny / Normalny / Ambitny)
 do wyboru, ile pułapek w zdaniach i literowaniu, czy jest podpowiedź po polsku i czy apka
 ułatwia po serii błędów. Domyślnie Normalny.
 
+## Dwoje dzieci na jednym urządzeniu
+
+Apka pamięta, kto grał ostatni, więc po odświeżeniu wchodzi wprost do jego mapy.
+Żeby przełączyć: **dotknij awatara w lewym górnym rogu → wybierz drugie dziecko z listy
+„Kto teraz gra?"**. Awatar ma znaczek ⇄, gdy jest więcej niż jeden gracz.
+
+Każdy gracz ma własny postęp, poziom, gwiazdki i własne ustawienia (głos, poziom zadań,
+poziom wyzwania).
+
 ## Prywatność
 
 Cały postęp siedzi w `IndexedDB` w przeglądarce. Aplikacja nie ma backendu, nie wysyła

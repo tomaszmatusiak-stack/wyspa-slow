@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 import { englishVoices, isFemaleVoice, resolveVoice } from '../audio/tts'
 import { useActiveProfile, useGame } from '../store/useGame'
+import { Emoji } from '../ui/Emoji'
 import { useSay } from './useSay'
 import { PrimaryButton, Tile } from '../ui/kit'
 import type { Challenge, Tier } from '../types'
@@ -9,6 +10,7 @@ import { CHALLENGE } from '../engine/difficulty'
 
 export function Settings({ onClose }: { onClose: () => void }) {
   const profile = useActiveProfile()
+  const profiles = useGame((s) => s.profiles)
   const update = useGame((s) => s.updateSettings)
   const selectProfile = useGame((s) => s.selectProfile)
   const say = useSay()
@@ -39,11 +41,51 @@ export function Settings({ onClose }: { onClose: () => void }) {
         className="max-h-[88vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-5 sm:rounded-3xl"
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-2xl font-black">Ustawienia</h2>
+          <h2 className="text-2xl font-black">Gracz i ustawienia</h2>
           <button type="button" onClick={onClose} className="text-2xl font-black text-ink-soft">
             ✕
           </button>
         </div>
+
+        {/* Przełączanie graczy na samej górze: dwoje dzieci na jednym tablecie
+            zmienia się codziennie, a ustawienia rusza się raz na urządzenie. */}
+        <Section title="Kto teraz gra?">
+          <div className="flex flex-col gap-2">
+            {profiles.map((p) => (
+              <Tile
+                key={p.id}
+                state={p.id === profile.id ? 'chosen' : 'idle'}
+                className="justify-between gap-3 px-4"
+                onClick={() => {
+                  if (p.id !== profile.id) selectProfile(p.id)
+                  onClose()
+                }}
+              >
+                <span className="flex items-center gap-3">
+                  <Emoji value={p.avatar} size="sm" />
+                  <span className="text-lg">{p.name}</span>
+                </span>
+                <span className="text-sm font-extrabold text-ink-soft">
+                  {p.id === profile.id ? 'teraz gra' : 'przełącz'}
+                </span>
+              </Tile>
+            ))}
+            <button
+              type="button"
+              onClick={() => {
+                selectProfile(null)
+                onClose()
+              }}
+              className="mt-1 py-2 font-extrabold text-violet-700 underline"
+            >
+              + Dodaj kolejnego gracza
+            </button>
+          </div>
+          <p className="mt-2 text-sm font-bold text-ink-soft">
+            Każdy gracz ma własny postęp, poziom i gwiazdki. Ustawienia poniżej dotyczą
+            tylko <strong>{profile.name}</strong>.
+          </p>
+        </Section>
 
         <Section title="Głos lektora">
           <select
@@ -162,18 +204,9 @@ export function Settings({ onClose }: { onClose: () => void }) {
           </div>
         </Section>
 
-        <div className="mt-6 flex gap-3">
-          <PrimaryButton className="flex-1" onClick={onClose}>
+        <div className="mt-6">
+          <PrimaryButton className="w-full" onClick={onClose}>
             Gotowe
-          </PrimaryButton>
-          <PrimaryButton
-            tone="slate"
-            onClick={() => {
-              selectProfile(null)
-              onClose()
-            }}
-          >
-            Zmień gracza
           </PrimaryButton>
         </div>
       </motion.div>
